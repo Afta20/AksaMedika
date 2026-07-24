@@ -35,8 +35,8 @@ export default function LandingPage() {
         <div className="max-w-7xl mx-auto px-6 h-16 flex items-center justify-between">
           {/* Logo */}
           <Link href="/" className="flex items-center gap-2.5">
-            <div className="w-8 h-8 rounded-xl bg-blue-600 flex items-center justify-center shadow-sm">
-              <Shield className="w-4 h-4 text-white" />
+            <div className="w-8 h-8 rounded-xl bg-blue-600 flex items-center justify-center shadow-sm p-1.5">
+              <img src="/aksamedika.svg" alt="Logo" className="w-full h-full object-contain invert brightness-0" />
             </div>
             <span className="text-slate-900 font-bold text-lg tracking-tight">
               Aksa<span className="text-blue-600">medika</span>
@@ -391,8 +391,8 @@ export default function LandingPage() {
         <div className="max-w-7xl mx-auto">
           <div className="flex flex-col md:flex-row items-center justify-between gap-6 mb-8">
             <div className="flex items-center gap-2.5">
-              <div className="w-8 h-8 bg-blue-600 rounded-xl flex items-center justify-center">
-                <Shield className="w-4 h-4 text-white" />
+              <div className="w-8 h-8 bg-blue-600 rounded-xl flex items-center justify-center p-1.5">
+                <img src="/aksamedika.svg" alt="Logo" className="w-full h-full object-contain invert brightness-0" />
               </div>
               <span className="text-white font-bold text-lg">Aksamedika</span>
             </div>

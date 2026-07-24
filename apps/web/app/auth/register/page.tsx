@@ -45,8 +45,8 @@ function RegisterForm() {
         <div className="absolute bottom-0 left-0 w-64 h-64 bg-blue-800/40 rounded-full translate-y-1/2 -translate-x-1/2" />
 
         <div className="relative z-10 flex items-center gap-3">
-          <div className="w-10 h-10 bg-white/20 backdrop-blur-sm rounded-xl flex items-center justify-center border border-white/30">
-            <Shield className="w-5 h-5 text-white" />
+          <div className="w-10 h-10 bg-white/20 backdrop-blur-sm rounded-xl flex items-center justify-center border border-white/30 p-2">
+            <img src="/aksamedika.svg" alt="Logo" className="w-full h-full object-contain" />
           </div>
           <span className="text-white font-bold text-xl">Aksamedika</span>
         </div>
@@ -79,8 +79,8 @@ function RegisterForm() {
       <div className="flex-1 flex flex-col justify-center px-6 py-12 lg:px-16 bg-white overflow-y-auto">
         <div className="max-w-sm mx-auto w-full">
           <Link href="/" className="lg:hidden flex items-center gap-2 mb-8">
-            <div className="w-8 h-8 bg-blue-600 rounded-xl flex items-center justify-center">
-              <Shield className="w-4 h-4 text-white" />
+            <div className="w-8 h-8 bg-blue-600 rounded-xl flex items-center justify-center p-1.5">
+              <img src="/aksamedika.svg" alt="Logo" className="w-full h-full object-contain invert brightness-0" />
             </div>
             <span className="text-slate-900 font-bold text-lg">Aksa<span className="text-blue-600">medika</span></span>
           </Link>
