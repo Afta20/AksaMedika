@@ -103,7 +103,7 @@ export interface ValidateAccessResponse {
 export interface AuditEntry {
   id: string;
   doctor_name: string;
-  access_method: 'PIN' | 'QR';
+  access_method: 'PIN' | 'QR' | 'EMERGENCY';
   ip_address?: string;
   accessed_at: string;
 }
