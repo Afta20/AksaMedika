@@ -290,9 +290,6 @@ export default function PatientDashboard() {
                             </span>
                             <div className="bg-slate-50 border border-slate-100 rounded-xl p-3 hover:border-blue-200 transition-colors">
                               <p className="text-sm font-bold text-slate-900">{r.diagnosis}</p>
-                              {r.notes && (
-                                <p className="text-xs text-slate-500 mt-1 line-clamp-2 leading-relaxed">{r.notes}</p>
-                              )}
                             </div>
                           </div>
                         </div>
