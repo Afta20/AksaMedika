@@ -53,6 +53,14 @@ func init() {
 			recordsHandler := records.NewHandler(pool)
 			auditHandler := audit.NewHandler(pool)
 
+			// Health check route for root URL
+			app.GET("/", func(c *gin.Context) {
+				c.JSON(200, gin.H{
+					"status":  "success",
+					"message": "Aksamedika API is running on Vercel Serverless!",
+				})
+			})
+
 			// Vercel routes all /api/... to this file, so we match the prefix
 			apiGroup := app.Group("/api")
 			{
