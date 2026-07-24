@@ -1,0 +1,75 @@
+version: '3.9'
+
+# =============================================================================
+# docker-compose.yml — Local Development Environment
+# Note: Production DB is Neon (cloud). This provides a local Postgres fallback.
+# Usage: docker-compose up -d
+# =============================================================================
+
+services:
+  # ---------------------------------------------------------------------------
+  # PostgreSQL — Local development database
+  # Mirrors Neon schema for offline development
+  # ---------------------------------------------------------------------------
+  postgres:
+    image: postgres:16-alpine
+    container_name: aksamedika_db
+    restart: unless-stopped
+    environment:
+      POSTGRES_DB: aksamedika
+      POSTGRES_USER: app_user
+      POSTGRES_PASSWORD: localdev_password
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+      - ./infra/db/migrations/001_init_schema.sql:/docker-entrypoint-initdb.d/01_schema.sql
+      - ./infra/db/migrations/002_rls_policies.sql:/docker-entrypoint-initdb.d/02_rls.sql
+      - ./infra/db/seed.sql:/docker-entrypoint-initdb.d/03_seed.sql
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U app_user -d aksamedika"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  # ---------------------------------------------------------------------------
+  # Go API — Backend service
+  # ---------------------------------------------------------------------------
+  api:
+    build:
+      context: ./apps/api
+      dockerfile: Dockerfile
+    container_name: aksamedika_api
+    restart: unless-stopped
+    depends_on:
+      postgres:
+        condition: service_healthy
+    environment:
+      DATABASE_URL: postgresql://app_user:localdev_password@postgres:5432/careguard?sslmode=disable
+      JWT_SECRET: localdev_jwt_secret_replace_in_production_min_64_chars
+      PORT: 8080
+      FRONTEND_URL: http://localhost:3000
+      GO_ENV: development
+    ports:
+      - "8080:8080"
+
+  # ---------------------------------------------------------------------------
+  # Next.js Frontend
+  # ---------------------------------------------------------------------------
+  web:
+    build:
+      context: ./apps/web
+      dockerfile: Dockerfile
+    container_name: careguard_web
+    restart: unless-stopped
+    depends_on:
+      - api
+    environment:
+      NEXT_PUBLIC_API_URL: http://localhost:8080
+      NEXT_PUBLIC_APP_NAME: "CareGuard by Aksamedika"
+    ports:
+      - "3000:3000"
+
+volumes:
+  postgres_data:
+    driver: local
