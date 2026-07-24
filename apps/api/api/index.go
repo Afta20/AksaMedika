@@ -6,11 +6,11 @@ import (
 	"os"
 	"sync"
 
-	"github.com/aksa-medika/api/internal/audit"
-	"github.com/aksa-medika/api/internal/auth"
-	"github.com/aksa-medika/api/internal/consent"
-	"github.com/aksa-medika/api/internal/db"
-	"github.com/aksa-medika/api/internal/records"
+	"github.com/aksa-medika/api/pkg/audit"
+	"github.com/aksa-medika/api/pkg/auth"
+	"github.com/aksa-medika/api/pkg/consent"
+	"github.com/aksa-medika/api/pkg/db"
+	"github.com/aksa-medika/api/pkg/records"
 	"github.com/gin-contrib/cors"
 	"github.com/gin-gonic/gin"
 )
