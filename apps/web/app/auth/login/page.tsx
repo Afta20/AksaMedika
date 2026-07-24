@@ -53,10 +53,10 @@ function LoginForm() {
 
         {/* Logo */}
         <div className="relative z-10 flex items-center gap-3">
-          <div className="w-10 h-10 bg-white/20 backdrop-blur-sm rounded-xl flex items-center justify-center border border-white/30 p-2">
+          <div className="w-12 h-12 bg-white/20 backdrop-blur-sm rounded-xl flex items-center justify-center border border-white/30 p-1">
             <img src="/aksamedika.svg" alt="Logo" className="w-full h-full object-contain" />
           </div>
-          <span className="text-white font-bold text-xl">Aksamedika</span>
+          <span className="text-white font-bold text-2xl">Aksamedika</span>
         </div>
 
         {/* Feature highlights */}
@@ -88,12 +88,11 @@ function LoginForm() {
       {/* ===== RIGHT: Form Panel ===== */}
       <div className="flex-1 flex flex-col justify-center px-6 py-12 lg:px-16 bg-white">
         <div className="max-w-sm mx-auto w-full">
-          {/* Mobile logo */}
-          <Link href="/" className="lg:hidden flex items-center gap-2 mb-8">
-            <div className="w-8 h-8 bg-blue-600 rounded-xl flex items-center justify-center p-1.5">
+          <Link href="/" className="lg:hidden flex items-center gap-3 mb-8">
+            <div className="w-10 h-10 bg-blue-600 rounded-xl flex items-center justify-center p-1 shadow-md shadow-blue-600/20">
               <img src="/aksamedika.svg" alt="Logo" className="w-full h-full object-contain invert brightness-0" />
             </div>
-            <span className="text-slate-900 font-bold text-lg">Aksa<span className="text-blue-600">medika</span></span>
+            <span className="text-slate-900 font-bold text-xl">Aksa<span className="text-blue-600">medika</span></span>
           </Link>
 
           <motion.div initial={{ opacity: 0, y: 16 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.4 }}>
