@@ -20,6 +20,7 @@ export default function PatientDashboard() {
   const [records, setRecords] = useState<MaskedRecord[]>([]);
   const [auditLogs, setAuditLogs] = useState<AuditEntry[]>([]);
   const [loading, setLoading] = useState(true);
+  const [sessionRevoked, setSessionRevoked] = useState(false);
 
   const loadData = useCallback(async (token: string) => {
     try {
@@ -63,10 +64,11 @@ export default function PatientDashboard() {
   const getInitials = (name: string) =>
     name.split(" ").map(n => n[0]).slice(0, 2).join("").toUpperCase();
 
-  // Check if there is an active session (any access in the last 30 mins)
-  const activeSession = auditLogs.find(log => differenceInMinutes(new Date(), new Date(log.accessed_at)) < 30);
+  // Check if there is an active session (any access in the last 30 mins) and not revoked
+  const activeSession = !sessionRevoked && auditLogs.find(log => differenceInMinutes(new Date(), new Date(log.accessed_at)) < 30);
 
   const handleKillSwitch = () => {
+    setSessionRevoked(true);
     toast.success("Akses berhasil dicabut! Semua dokter telah dikeluarkan dari sesi Anda.");
     // In a real app, this would call an API to invalidate all active tokens.
   };
