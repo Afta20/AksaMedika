@@ -32,9 +32,16 @@ func init() {
 
 		app = gin.Default()
 
+		frontendURL := os.Getenv("FRONTEND_URL")
+		var origins []string
+		if frontendURL != "" {
+			origins = append(origins, frontendURL)
+		}
+		origins = append(origins, "http://localhost:3000", "https://aksa-medika.vercel.app")
+
 		// CORS — allow Next.js frontend
 		app.Use(cors.New(cors.Config{
-			AllowOrigins:     []string{os.Getenv("FRONTEND_URL"), "http://localhost:3000", "https://aksa-medika.vercel.app"},
+			AllowOrigins:     origins,
 			AllowMethods:     []string{"GET", "POST", "PUT", "DELETE", "OPTIONS"},
 			AllowHeaders:     []string{"Origin", "Content-Type", "Authorization"},
 			AllowCredentials: true,
