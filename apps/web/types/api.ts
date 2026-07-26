@@ -137,7 +137,7 @@ export interface DoctorHistoryResponse {
 // -------------------------------- Break-Glass / AI --------------------------------
 
 export interface EmergencyAccessPayload {
-  patient_email: string;
+  patient_nik: string;
   reason: string;
 }
 

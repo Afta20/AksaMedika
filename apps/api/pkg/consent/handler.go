@@ -189,8 +189,8 @@ func generatePIN() (string, error) {
 
 // EmergencyAccessRequest is the body for break-glass emergency access.
 type EmergencyAccessRequest struct {
-	PatientEmail string `json:"patient_email" binding:"required,email"`
-	Reason       string `json:"reason" binding:"required"`
+	PatientNIK string `json:"patient_nik" binding:"required,len=16"`
+	Reason     string `json:"reason" binding:"required"`
 }
 
 // EmergencyAccess bypasses normal consent and grants immediate access, logging it as an EMERGENCY.
@@ -211,8 +211,8 @@ func (h *Handler) EmergencyAccess(c *gin.Context) {
 	)
 
 	err := h.db.QueryRow(context.Background(),
-		`SELECT id, name FROM users WHERE email = $1 AND role = 'patient'`,
-		req.PatientEmail,
+		`SELECT id, name FROM users WHERE nik = $1 AND role = 'patient'`,
+		req.PatientNIK,
 	).Scan(&patientID, &patientName)
 
 	if err != nil {

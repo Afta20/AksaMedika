@@ -13,7 +13,7 @@ export default function PatientSettingsPage() {
   useEffect(() => {
     const loadSettings = async () => {
       try {
-        const token = localStorage.getItem("token");
+        const token = localStorage.getItem("cg_token");
         if (token) {
           const res = await getPatientSettings(token);
           if (res.nik) {
@@ -39,7 +39,7 @@ export default function PatientSettingsPage() {
     setSaving(true);
     setMessage(null);
     try {
-      const token = localStorage.getItem("token");
+      const token = localStorage.getItem("cg_token");
       if (token) {
         await updatePatientSettings(token, nik);
         setMessage({ type: "success", text: "Pengaturan keamanan berhasil diperbarui." });

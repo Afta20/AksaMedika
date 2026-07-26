@@ -43,7 +43,7 @@ function DashboardContent() {
   // Spectacular Features State
   const [showQR, setShowQR] = useState(false);
   const [showEmergency, setShowEmergency] = useState(false);
-  const [emergencyEmail, setEmergencyEmail] = useState("");
+  const [emergencyNik, setEmergencyNik] = useState("");
   const [emergencyReason, setEmergencyReason] = useState("");
   
   const [aiSummary, setAiSummary] = useState<string | null>(null);
@@ -222,7 +222,7 @@ function DashboardContent() {
     setState("loading");
     const token = localStorage.getItem("cg_token")!;
     try {
-      const res = await doctorApi.emergencyAccess({ patient_email: emergencyEmail, reason: emergencyReason }, token);
+      const res = await doctorApi.emergencyAccess({ patient_nik: emergencyNik, reason: emergencyReason }, token);
       setPatient(res);
       setState("success");
       setShowEmergency(false);
@@ -523,8 +523,8 @@ function DashboardContent() {
                 <CardContent className="pt-6 bg-white rounded-b-xl">
                   <form onSubmit={handleEmergencyAccess} className="space-y-4">
                     <div className="space-y-1.5">
-                      <Label className="font-bold text-slate-700">Email Pasien Target</Label>
-                      <Input type="email" required value={emergencyEmail} onChange={e => setEmergencyEmail(e.target.value)} placeholder="email@pasien.com" className="border-rose-200 focus-visible:ring-rose-500" />
+                      <Label className="font-bold text-slate-700">NIK Pasien Target (16 Digit)</Label>
+                      <Input type="text" required value={emergencyNik} onChange={e => setEmergencyNik(e.target.value.replace(/\D/g, '').slice(0, 16))} placeholder="0000000000000000" className="border-rose-200 focus-visible:ring-rose-500 font-mono tracking-widest" />
                     </div>
                     <div className="space-y-1.5">
                       <Label className="font-bold text-slate-700">Alasan Darurat Kritis</Label>
