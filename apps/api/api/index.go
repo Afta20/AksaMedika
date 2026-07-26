@@ -10,6 +10,7 @@ import (
 	"github.com/aksa-medika/api/pkg/auth"
 	"github.com/aksa-medika/api/pkg/consent"
 	"github.com/aksa-medika/api/pkg/db"
+	"github.com/aksa-medika/api/pkg/kiosk"
 	"github.com/aksa-medika/api/pkg/records"
 	"github.com/gin-contrib/cors"
 	"github.com/gin-gonic/gin"
@@ -52,6 +53,7 @@ func init() {
 			consentHandler := consent.NewHandler(pool)
 			recordsHandler := records.NewHandler(pool)
 			auditHandler := audit.NewHandler(pool)
+			kioskHandler := kiosk.NewHandler(pool)
 
 			// Health check route for root URL
 			app.GET("/", func(c *gin.Context) {
@@ -67,6 +69,12 @@ func init() {
 				apiGroup.POST("/auth/register", authHandler.Register)
 				apiGroup.POST("/auth/login", authHandler.Login)
 			}
+			
+			// Kiosk public routes (no token required, it uses Doctor credentials directly)
+			kioskGroup := apiGroup.Group("/kiosk")
+			{
+				kioskGroup.POST("/emergency-access", kioskHandler.EmergencyAccess)
+			}
 
 			patient := apiGroup.Group("/patient")
 			patient.Use(auth.JWTMiddleware("patient"))
@@ -74,6 +82,8 @@ func init() {
 				patient.POST("/consent/generate", consentHandler.Generate)
 				patient.GET("/records", recordsHandler.ListPatientRecords)
 				patient.GET("/audit", auditHandler.GetPatientAuditLog)
+				patient.GET("/settings", authHandler.GetPatientSettings)
+				patient.PUT("/settings", authHandler.UpdatePatientSettings)
 			}
 
 			doctor := apiGroup.Group("/doctor")

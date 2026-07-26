@@ -159,3 +159,58 @@ func (h *Handler) GetDoctorProfile(c *gin.Context) {
 	})
 }
 
+// GetPatientSettings returns the authenticated patient's profile details including NIK.
+// GET /api/patient/settings
+func (h *Handler) GetPatientSettings(c *gin.Context) {
+	patientID := c.GetString("user_id")
+
+	var name, email string
+	var nik *string
+
+	err := h.db.QueryRow(context.Background(),
+		`SELECT name, email, nik FROM users WHERE id = $1 AND role = 'patient'`,
+		patientID,
+	).Scan(&name, &email, &nik)
+
+	if err != nil {
+		c.JSON(http.StatusNotFound, gin.H{"error": "Patient profile not found"})
+		return
+	}
+
+	c.JSON(http.StatusOK, gin.H{
+		"id":    patientID,
+		"name":  name,
+		"email": email,
+		"nik":   nik,
+	})
+}
+
+// UpdatePatientSettingsRequest is the body for updating patient settings.
+type UpdatePatientSettingsRequest struct {
+	NIK string `json:"nik" binding:"required,len=16"`
+}
+
+// UpdatePatientSettings updates the authenticated patient's settings.
+// PUT /api/patient/settings
+func (h *Handler) UpdatePatientSettings(c *gin.Context) {
+	patientID := c.GetString("user_id")
+
+	var req UpdatePatientSettingsRequest
+	if err := c.ShouldBindJSON(&req); err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "NIK harus persis 16 digit angka."})
+		return
+	}
+
+	_, err := h.db.Exec(context.Background(),
+		`UPDATE users SET nik = $1, updated_at = now() WHERE id = $2 AND role = 'patient'`,
+		req.NIK, patientID,
+	)
+
+	if err != nil {
+		c.JSON(http.StatusConflict, gin.H{"error": "Gagal menyimpan pengaturan atau NIK sudah terdaftar."})
+		return
+	}
+
+	c.JSON(http.StatusOK, gin.H{"message": "Pengaturan berhasil diperbarui."})
+}
+

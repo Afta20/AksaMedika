@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useState, useRef, useCallback } from "react";
-import { useRouter } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 import { motion, AnimatePresence } from "framer-motion";
 import {
   Shield, LogOut, Stethoscope, Users, Search, ChevronRight,
@@ -24,6 +24,8 @@ type PortalState = "idle" | "loading" | "success" | "error";
 
 export default function DoctorDashboard() {
   const router = useRouter();
+  const searchParams = useSearchParams();
+  const emergencyParam = searchParams?.get("emergency");
   
   // Doctor Data
   const [profile, setProfile] = useState<DoctorProfile | null>(null);
@@ -80,9 +82,52 @@ export default function DoctorDashboard() {
 
   useEffect(() => {
     const token = localStorage.getItem("cg_token");
-    if (!token) { router.push("/auth/login?role=doctor"); return; }
-    loadDoctorData(token);
-  }, [router, loadDoctorData]);
+    const userStr = localStorage.getItem("cg_user");
+    if (!token || !userStr) { router.push("/auth/login?role=doctor"); return; }
+    
+    const u = JSON.parse(userStr) as UserType;
+    if (u.role !== "doctor") { router.push("/auth/login?role=doctor"); return; }
+    
+    if (u.id !== "ER-KIOSK") {
+      loadDoctorData(token);
+    }
+    
+    // If redirected from Kiosk with emergency param, auto-load records
+    if (emergencyParam) {
+      setPatient({
+        patient_id: emergencyParam,
+        patient_name: "Pasien Darurat (Kiosk)",
+        message: "EMERGENCY ACCESS GRANTED"
+      });
+      fetchRecordsAndAI(emergencyParam, token);
+    }
+    
+    // KIOSK MODE: 60s inactivity auto-logout
+    if (u.id === "ER-KIOSK") {
+      let timeout: NodeJS.Timeout;
+      const resetTimer = () => {
+        clearTimeout(timeout);
+        timeout = setTimeout(() => {
+          toast.error("Sesi Kiosk Darurat Habis (Auto-Logout)");
+          localStorage.removeItem("cg_token");
+          localStorage.removeItem("cg_user");
+          router.push("/kiosk");
+        }, 60000); // 60 seconds
+      };
+      
+      window.addEventListener("mousemove", resetTimer);
+      window.addEventListener("keydown", resetTimer);
+      window.addEventListener("touchstart", resetTimer);
+      resetTimer();
+      
+      return () => {
+        clearTimeout(timeout);
+        window.removeEventListener("mousemove", resetTimer);
+        window.removeEventListener("keydown", resetTimer);
+        window.removeEventListener("touchstart", resetTimer);
+      };
+    }
+  }, [router, loadDoctorData, emergencyParam]);
 
   const handleLogout = () => {
     localStorage.removeItem("cg_token");

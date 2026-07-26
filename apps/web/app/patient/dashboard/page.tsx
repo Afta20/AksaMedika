@@ -3,7 +3,7 @@
 import { useEffect, useState, useCallback } from "react";
 import { useRouter } from "next/navigation";
 import { motion, AnimatePresence } from "framer-motion";
-import { Shield, FileText, Clock, Activity, LogOut, Zap, ChevronRight, User, TriangleAlert, QrCode, PowerOff, ShieldCheck } from "lucide-react";
+import { Shield, FileText, Clock, Activity, LogOut, Zap, ChevronRight, User, TriangleAlert, QrCode, PowerOff, ShieldCheck, Settings } from "lucide-react";
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Skeleton } from "@/components/ui/skeleton";
@@ -92,14 +92,20 @@ export default function PatientDashboard() {
               </div>
             )}
             {user && (
-              <div className="w-9 h-9 bg-blue-100 rounded-full flex items-center justify-center shadow-inner border border-blue-200">
+              <div className="w-9 h-9 bg-blue-100 rounded-full flex items-center justify-center shadow-inner border border-blue-200 mr-2">
                 <span className="text-blue-700 text-xs font-bold">{getInitials(user.name)}</span>
               </div>
             )}
-            <button onClick={handleLogout}
-              className="text-slate-400 hover:text-rose-600 transition-colors p-2 rounded-xl hover:bg-rose-50 border border-transparent hover:border-rose-100 ml-2">
-              <LogOut className="w-4 h-4" />
-            </button>
+            <div className="flex items-center gap-1 border-l border-slate-200 pl-4">
+              <Link href="/patient/settings"
+                className="text-slate-400 hover:text-blue-600 transition-colors p-2 rounded-xl hover:bg-blue-50">
+                <Settings className="w-4 h-4" />
+              </Link>
+              <button onClick={handleLogout}
+                className="text-slate-400 hover:text-rose-600 transition-colors p-2 rounded-xl hover:bg-rose-50">
+                <LogOut className="w-4 h-4" />
+              </button>
+            </div>
           </div>
         </div>
       </nav>
