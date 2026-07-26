@@ -12,7 +12,7 @@ import (
 
 	"github.com/gin-gonic/gin"
 	"github.com/jackc/pgx/v5/pgxpool"
-	"aksa-medika/apps/api/pkg/crypto"
+	"github.com/aksa-medika/api/pkg/crypto"
 )
 
 // Handler holds the DB pool for records operations.

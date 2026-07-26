@@ -112,3 +112,23 @@ export const doctorApi = {
   getProfile: (token: string) =>
     apiFetch<DoctorProfile>('/api/doctor/profile', {}, token),
 };
+
+// ============================================================================
+// Settings & Kiosk API
+// ============================================================================
+
+export const getPatientSettings = (token: string) =>
+  apiFetch<any>('/api/patient/settings', {}, token);
+
+export const updatePatientSettings = (token: string, nik: string) =>
+  apiFetch<any>('/api/patient/settings', {
+    method: 'PUT',
+    body: JSON.stringify({ nik }),
+  }, token);
+
+export const kioskEmergencyAccess = (payload: { nik: string, doctor_email: string, doctor_password: string }) =>
+  apiFetch<any>('/api/kiosk/emergency-access', {
+    method: 'POST',
+    body: JSON.stringify(payload),
+  });
+

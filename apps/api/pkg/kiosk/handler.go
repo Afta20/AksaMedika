@@ -84,7 +84,7 @@ func (h *Handler) EmergencyAccess(c *gin.Context) {
 	}
 
 	// 4. Generate Doctor JWT so the frontend can fetch records
-	token, err := auth.GenerateJWT(doctorID, "doctor", doctorName)
+	token, err := auth.GenerateToken(doctorID, "doctor", doctorName)
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": "Gagal membuat sesi darurat"})
 		return

@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState, useRef, useCallback } from "react";
+import { useEffect, useState, useRef, useCallback, Suspense } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import { motion, AnimatePresence } from "framer-motion";
 import {
@@ -18,11 +18,11 @@ import { Badge } from "@/components/ui/badge";
 import { toast } from "sonner";
 import { doctorApi } from "@/lib/api";
 import QRScanner from "@/components/QRScanner";
-import type { MedicalRecord, ValidateAccessResponse, DoctorProfile, DoctorStats, DoctorHistoryEntry } from "@/types/api";
+import type { MedicalRecord, ValidateAccessResponse, DoctorProfile, DoctorStats, DoctorHistoryEntry, User as UserType } from "@/types/api";
 
 type PortalState = "idle" | "loading" | "success" | "error";
 
-export default function DoctorDashboard() {
+function DashboardContent() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const emergencyParam = searchParams?.get("emergency");
@@ -741,5 +741,13 @@ export default function DoctorDashboard() {
         </AnimatePresence>
       </main>
     </div>
+  );
+}
+
+export default function DoctorDashboard() {
+  return (
+    <Suspense fallback={<div className="min-h-screen bg-slate-50 flex items-center justify-center font-bold text-slate-500">Memuat Dashboard...</div>}>
+      <DashboardContent />
+    </Suspense>
   );
 }
