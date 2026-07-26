@@ -18,6 +18,7 @@ CREATE TABLE IF NOT EXISTS users (
   password_hash TEXT NOT NULL,
   specialty     TEXT,        -- Doctor only: e.g. "Cardiologist", "General Practitioner"
   license_no    TEXT,        -- Doctor only: Medical license number
+  nik           VARCHAR(16) UNIQUE, -- Patient only: 16-digit National ID
   avatar_url    TEXT,        -- Optional profile photo
   created_at    TIMESTAMPTZ DEFAULT now(),
   updated_at    TIMESTAMPTZ DEFAULT now()
@@ -37,6 +38,7 @@ CREATE TABLE IF NOT EXISTS medical_records (
   notes         TEXT,
   visit_date    DATE NOT NULL,
   icd_code      TEXT,        -- Optional: ICD-10 diagnosis code for structured data
+  data_integrity_hash TEXT,  -- Web3-ready: SHA-256 hash of patient_id+diagnosis+visit_date
   created_at    TIMESTAMPTZ DEFAULT now(),
   updated_at    TIMESTAMPTZ DEFAULT now()
 );

@@ -12,6 +12,7 @@ import (
 
 	"github.com/gin-gonic/gin"
 	"github.com/jackc/pgx/v5/pgxpool"
+	"aksa-medika/apps/api/pkg/crypto"
 )
 
 // Handler holds the DB pool for records operations.
@@ -51,7 +52,7 @@ func (h *Handler) ListPatientRecords(c *gin.Context) {
 	patientID := c.GetString("user_id")
 
 	rows, err := h.db.Query(context.Background(),
-		`SELECT id, visit_date, diagnosis, created_at
+		`SELECT id, visit_date, diagnosis, created_at, COALESCE(data_integrity_hash, '')
 		 FROM medical_records
 		 WHERE patient_id = $1
 		 ORDER BY visit_date DESC`,
@@ -66,9 +67,23 @@ func (h *Handler) ListPatientRecords(c *gin.Context) {
 	var records []MaskedRecord
 	for rows.Next() {
 		var r MaskedRecord
-		if err := rows.Scan(&r.ID, &r.VisitDate, &r.Diagnosis, &r.CreatedAt); err != nil {
+		var diag, hash string
+		if err := rows.Scan(&r.ID, &r.VisitDate, &diag, &r.CreatedAt, &hash); err != nil {
 			continue
 		}
+		
+		decryptedDiag, _ := crypto.Decrypt(diag)
+		
+		if hash != "" {
+			computedHash := crypto.GenerateDataHash(patientID, decryptedDiag, r.VisitDate)
+			if computedHash != hash {
+				r.Diagnosis = "⚠️ DATA TERINDIKASI DIMANIPULASI"
+				records = append(records, r)
+				continue
+			}
+		}
+
+		r.Diagnosis = decryptedDiag
 		// API masking: partially redact diagnosis for the patient's own list
 		// (Full record visible on detail page — patient can always see their own full data)
 		records = append(records, r)
@@ -113,7 +128,7 @@ func (h *Handler) GetPatientRecordsForDoctor(c *gin.Context) {
 	rows, err := h.db.Query(context.Background(),
 		`SELECT mr.id, mr.patient_id, mr.doctor_id, COALESCE(u.name, 'Unknown') as doctor_name,
 		        mr.diagnosis, COALESCE(mr.prescription, ''), COALESCE(mr.notes, ''),
-		        mr.visit_date::text, mr.created_at::text
+		        mr.visit_date::text, mr.created_at::text, COALESCE(mr.data_integrity_hash, '')
 		 FROM medical_records mr
 		 LEFT JOIN users u ON u.id = mr.doctor_id
 		 WHERE mr.patient_id = $1
@@ -129,12 +144,30 @@ func (h *Handler) GetPatientRecordsForDoctor(c *gin.Context) {
 	var records []MedicalRecord
 	for rows.Next() {
 		var r MedicalRecord
+		var diag, pres, notes, hash string
 		if err := rows.Scan(
 			&r.ID, &r.PatientID, &r.DoctorID, &r.DoctorName,
-			&r.Diagnosis, &r.Prescription, &r.Notes, &r.VisitDate, &r.CreatedAt,
+			&diag, &pres, &notes, &r.VisitDate, &r.CreatedAt, &hash,
 		); err != nil {
 			continue
 		}
+
+		decryptedDiag, _ := crypto.Decrypt(diag)
+		decryptedPres, _ := crypto.Decrypt(pres)
+		decryptedNotes, _ := crypto.Decrypt(notes)
+
+		if hash != "" {
+			computedHash := crypto.GenerateDataHash(r.PatientID, decryptedDiag, r.VisitDate)
+			if computedHash != hash {
+				c.JSON(http.StatusConflict, gin.H{"error": "Security Alert: Data terindikasi dimanipulasi pada level database!"})
+				return
+			}
+		}
+
+		r.Diagnosis = decryptedDiag
+		r.Prescription = decryptedPres
+		r.Notes = decryptedNotes
+
 		records = append(records, r)
 	}
 
@@ -183,17 +216,26 @@ func (h *Handler) CreateRecord(c *gin.Context) {
 		return
 	}
 
+	// Web3-Ready: Generate Data Integrity Hash on plaintext
+	dataHash := crypto.GenerateDataHash(patientID, req.Diagnosis, req.VisitDate)
+
+	// Column-Level Encryption for sensitive fields
+	encryptedDiag, _ := crypto.Encrypt(req.Diagnosis)
+	encryptedPres, _ := crypto.Encrypt(req.Prescription)
+	encryptedNotes, _ := crypto.Encrypt(req.Notes)
+
 	var recordID string
 	insertErr := h.db.QueryRow(context.Background(),
-		`INSERT INTO medical_records (patient_id, doctor_id, diagnosis, prescription, notes, icd_code, visit_date)
-		 VALUES ($1, $2, $3, $4, $5, $6, $7::date)
+		`INSERT INTO medical_records (patient_id, doctor_id, diagnosis, prescription, notes, icd_code, visit_date, data_integrity_hash)
+		 VALUES ($1, $2, $3, $4, $5, $6, $7::date, $8)
 		 RETURNING id`,
 		patientID, doctorID,
-		req.Diagnosis,
-		nullIfEmpty(req.Prescription),
-		nullIfEmpty(req.Notes),
+		encryptedDiag,
+		nullIfEmpty(encryptedPres),
+		nullIfEmpty(encryptedNotes),
 		nullIfEmpty(req.ICDCode),
 		req.VisitDate,
+		dataHash,
 	).Scan(&recordID)
 
 	if insertErr != nil {
@@ -255,7 +297,7 @@ func (h *Handler) GetPatientSummaryAI(c *gin.Context) {
 
 	// Fetch full records
 	rows, err := h.db.Query(context.Background(),
-		`SELECT diagnosis, COALESCE(prescription, ''), COALESCE(notes, ''), visit_date::text
+		`SELECT diagnosis, COALESCE(prescription, ''), COALESCE(notes, ''), visit_date::text, COALESCE(data_integrity_hash, '')
 		 FROM medical_records
 		 WHERE patient_id = $1
 		 ORDER BY visit_date DESC`,
@@ -269,9 +311,19 @@ func (h *Handler) GetPatientSummaryAI(c *gin.Context) {
 
 	var contextText string
 	for rows.Next() {
-		var diag, pres, notes, vdate string
-		if err := rows.Scan(&diag, &pres, &notes, &vdate); err == nil {
-			contextText += fmt.Sprintf("Date: %s, Diagnosis: %s, Prescription: %s, Notes: %s\n", vdate, diag, pres, notes)
+		var diag, pres, notes, vdate, hash string
+		if err := rows.Scan(&diag, &pres, &notes, &vdate, &hash); err == nil {
+			decryptedDiag, _ := crypto.Decrypt(diag)
+			decryptedPres, _ := crypto.Decrypt(pres)
+			decryptedNotes, _ := crypto.Decrypt(notes)
+			
+			if hash != "" {
+				computedHash := crypto.GenerateDataHash(patientID, decryptedDiag, vdate)
+				if computedHash != hash {
+					continue // skip tampered data for AI summary
+				}
+			}
+			contextText += fmt.Sprintf("Date: %s, Diagnosis: %s, Prescription: %s, Notes: %s\n", vdate, decryptedDiag, decryptedPres, decryptedNotes)
 		}
 	}
 
