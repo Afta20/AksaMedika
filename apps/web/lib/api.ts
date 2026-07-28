@@ -72,6 +72,11 @@ export const patientApi = {
 
   getAuditLog: (token: string) =>
     apiFetch<AuditLogResponse>('/api/patient/audit', {}, token),
+
+  revokeAccess: (token: string) =>
+    apiFetch<{ message: string }>('/api/patient/revoke-access', {
+      method: 'POST',
+    }, token),
 };
 
 // ============================================================================

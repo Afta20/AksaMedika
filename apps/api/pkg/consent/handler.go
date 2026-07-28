@@ -247,3 +247,23 @@ func (h *Handler) EmergencyAccess(c *gin.Context) {
 	})
 }
 
+// RevokeAccess allows a patient to forcibly revoke any active sessions by writing a REVOKED audit log.
+// POST /api/patient/revoke-access
+func (h *Handler) RevokeAccess(c *gin.Context) {
+	patientID := c.GetString("user_id")
+	patientName := c.GetString("user_name")
+
+	// Insert a REVOKED audit log to signal that the session is dead
+	_, err := h.db.Exec(context.Background(),
+		`INSERT INTO audit_logs (patient_id, doctor_id, doctor_name, access_method, ip_address)
+		 VALUES ($1, $1, $2, 'REVOKED', 'Pasien mencabut izin akses')`,
+		patientID, patientName,
+	)
+
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "Gagal mencabut izin akses"})
+		return
+	}
+
+	c.JSON(http.StatusOK, gin.H{"message": "Izin akses berhasil dicabut"})
+}

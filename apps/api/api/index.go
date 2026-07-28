@@ -84,6 +84,7 @@ func init() {
 				patient.GET("/audit", auditHandler.GetPatientAuditLog)
 				patient.GET("/settings", authHandler.GetPatientSettings)
 				patient.PUT("/settings", authHandler.UpdatePatientSettings)
+				patient.POST("/revoke-access", consentHandler.RevokeAccess)
 			}
 
 			doctor := apiGroup.Group("/doctor")

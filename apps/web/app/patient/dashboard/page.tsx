@@ -65,13 +65,23 @@ export default function PatientDashboard() {
   const getInitials = (name: string) =>
     name.split(" ").map(n => n[0]).slice(0, 2).join("").toUpperCase();
 
-  // Check if there is an active session (any access in the last 30 mins) and not revoked
-  const activeSession = !sessionRevoked && auditLogs.find(log => differenceInMinutes(new Date(), new Date(log.accessed_at)) < 30);
+  // Get the most recent access log
+  const recentLog = auditLogs[0];
+  // Check if there is an active session (any access in the last 30 mins) AND the most recent action is NOT 'REVOKED'
+  const activeSession = !sessionRevoked && recentLog && recentLog.access_method !== 'REVOKED' && differenceInMinutes(new Date(), new Date(recentLog.accessed_at)) < 30;
 
-  const handleKillSwitch = () => {
-    setSessionRevoked(true);
-    toast.success("Akses berhasil dicabut! Semua dokter telah dikeluarkan dari sesi Anda.");
-    // In a real app, this would call an API to invalidate all active tokens.
+  const handleKillSwitch = async () => {
+    try {
+      const token = localStorage.getItem("cg_token");
+      if (token) {
+        await patientApi.revokeAccess(token);
+        setSessionRevoked(true);
+        toast.success("Akses berhasil dicabut! Semua sesi telah dihentikan paksa.");
+        loadData(token); // Reload data to get the new REVOKED audit log
+      }
+    } catch (err) {
+      toast.error("Gagal mencabut akses. Coba lagi.");
+    }
   };
 
   return (
