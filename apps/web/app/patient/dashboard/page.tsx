@@ -21,6 +21,7 @@ export default function PatientDashboard() {
   const [auditLogs, setAuditLogs] = useState<AuditEntry[]>([]);
   const [loading, setLoading] = useState(true);
   const [sessionRevoked, setSessionRevoked] = useState(false);
+  const [showQRZoom, setShowQRZoom] = useState(false);
 
   const loadData = useCallback(async (token: string) => {
     try {
@@ -152,16 +153,19 @@ export default function PatientDashboard() {
                 </div>
 
                 <div className="relative z-10 flex items-center gap-5 bg-white/10 backdrop-blur-md p-4 rounded-2xl border border-white/20">
-                  <div className="bg-white p-2 rounded-xl shrink-0">
+                  <div 
+                    className="bg-white p-2 rounded-xl shrink-0 cursor-pointer hover:scale-105 transition-transform" 
+                    onClick={() => user && setShowQRZoom(true)}
+                  >
                     {user ? (
                       <QRCodeSVG value={`PATIENT:${user.id}`} size={64} level="Q" className="rounded-md" />
                     ) : (
                       <Skeleton className="w-16 h-16 rounded-md bg-white/50" />
                     )}
                   </div>
-                  <div>
-                    <p className="text-white font-semibold text-sm">Scan untuk Profil</p>
-                    <p className="text-blue-100 text-xs mt-1 leading-relaxed">Tunjukkan QR ini ke petugas medis untuk identifikasi cepat.</p>
+                  <div onClick={() => user && setShowQRZoom(true)} className="cursor-pointer">
+                    <p className="text-white font-semibold text-sm hover:underline">Scan untuk Profil</p>
+                    <p className="text-blue-100 text-xs mt-1 leading-relaxed">Ketuk QR ini untuk memperbesar.</p>
                   </div>
                 </div>
               </div>
@@ -374,6 +378,41 @@ export default function PatientDashboard() {
           </div>
         </div>
       </main>
+
+      {/* QR Zoom Modal */}
+      <AnimatePresence>
+        {showQRZoom && user && (
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/40 backdrop-blur-sm"
+            onClick={() => setShowQRZoom(false)}
+          >
+            <motion.div
+              initial={{ scale: 0.9, opacity: 0 }}
+              animate={{ scale: 1, opacity: 1 }}
+              exit={{ scale: 0.9, opacity: 0 }}
+              className="bg-white p-8 rounded-3xl shadow-2xl flex flex-col items-center"
+              onClick={(e) => e.stopPropagation()}
+            >
+              <h2 className="text-xl font-bold text-slate-900 mb-6 text-center">QR Code Pasien</h2>
+              <div className="p-4 bg-white border-2 border-slate-100 rounded-2xl shadow-inner mb-6">
+                <QRCodeSVG value={`PATIENT:${user.id}`} size={256} level="Q" />
+              </div>
+              <p className="text-slate-500 font-medium mb-8 text-center max-w-[250px]">
+                Tunjukkan layar ini kepada dokter untuk discan dari perangkat mereka.
+              </p>
+              <button
+                onClick={() => setShowQRZoom(false)}
+                className="px-8 py-3 bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold rounded-xl transition-colors w-full"
+              >
+                Tutup
+              </button>
+            </motion.div>
+          </motion.div>
+        )}
+      </AnimatePresence>
     </div>
   );
 }
