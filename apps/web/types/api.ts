@@ -8,6 +8,7 @@ export interface User {
   id: string;
   name: string;
   role: 'patient' | 'doctor';
+  is_kiosk?: boolean;
 }
 
 export interface AuthResponse {

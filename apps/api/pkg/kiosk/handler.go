@@ -95,5 +95,7 @@ func (h *Handler) EmergencyAccess(c *gin.Context) {
 		"token":        token,
 		"patient_id":   patientID,
 		"patient_name": patientName,
+		"doctor_id":    doctorID,
+		"doctor_name":  doctorName,
 	})
 }

@@ -35,14 +35,15 @@ export default function KioskPage() {
       // Simpan token sementara untuk melihat rekam medis
       localStorage.setItem("cg_token", res.token);
       localStorage.setItem("cg_user", JSON.stringify({
-        id: "ER-KIOSK",
-        name: "Doctor Kiosk",
-        role: "doctor"
+        id: res.doctor_id || "ER-KIOSK",
+        name: res.doctor_name || "Doctor Kiosk",
+        role: "doctor",
+        is_kiosk: true
       }));
       
       toast.success(res.message);
       // Pindah ke dashboard dokter untuk melihat pasien tersebut
-      router.push(`/doctor/dashboard?emergency=${res.patient_id}`);
+      router.push(`/doctor/dashboard?emergency=${res.patient_id}&name=${encodeURIComponent(res.patient_name)}&nik=${nik}`);
     } catch (err: any) {
       setError(err.message || "Akses Darurat Ditolak.");
     } finally {

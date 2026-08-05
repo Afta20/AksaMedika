@@ -26,6 +26,7 @@ function DashboardContent() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const emergencyParam = searchParams?.get("emergency");
+  const emergencyName = searchParams?.get("name");
   
   // Doctor Data
   const [profile, setProfile] = useState<DoctorProfile | null>(null);
@@ -88,7 +89,7 @@ function DashboardContent() {
     const u = JSON.parse(userStr) as UserType;
     if (u.role !== "doctor") { router.push("/auth/login?role=doctor"); return; }
     
-    if (u.id !== "ER-KIOSK") {
+    if (!u.is_kiosk) {
       loadDoctorData(token);
     }
     
@@ -96,14 +97,14 @@ function DashboardContent() {
     if (emergencyParam) {
       setPatient({
         patient_id: emergencyParam,
-        patient_name: "Pasien Darurat (Kiosk)",
+        patient_name: emergencyName || "Pasien Darurat (Kiosk)",
         message: "EMERGENCY ACCESS GRANTED"
       });
       fetchRecordsAndAI(emergencyParam, token);
     }
     
     // KIOSK MODE: 60s inactivity auto-logout
-    if (u.id === "ER-KIOSK") {
+    if (u.is_kiosk) {
       let timeout: NodeJS.Timeout;
       const resetTimer = () => {
         clearTimeout(timeout);
@@ -192,7 +193,7 @@ function DashboardContent() {
       setState("error");
       setShaking(true);
       setTimeout(() => setShaking(false), 600);
-      toast.error(err instanceof Error ? err.message : "PIN tidak valid atau sudah kedaluwarsa");
+      toast.error("Token akses tidak valid atau telah kedaluwarsa");
       setTimeout(() => { setState("idle"); setPin(["", "", "", "", "", ""]); }, 2500);
     }
   };
@@ -212,7 +213,7 @@ function DashboardContent() {
       setState("error");
       setShaking(true);
       setTimeout(() => setShaking(false), 600);
-      toast.error(err instanceof Error ? err.message : "QR Code tidak valid atau kedaluwarsa");
+      toast.error("QR Code tidak valid atau telah kedaluwarsa");
       setTimeout(() => { setState("idle"); }, 2500);
     }
   };
@@ -601,6 +602,14 @@ function DashboardContent() {
                   ) : (
                     <p className="text-sm text-slate-500">Tidak ada riwayat medis untuk dianalisis.</p>
                   )}
+                  
+                  {/* AI Clinical Safety Disclaimer */}
+                  <div className="mt-6 bg-amber-50 border-l-4 border-amber-500 p-3 rounded-r-xl">
+                    <p className="text-amber-800 text-xs font-semibold flex items-start gap-2">
+                      <AlertCircle className="w-4 h-4 shrink-0 mt-0.5" />
+                      Disclaimer Klinis: Ringkasan AI ini hanya sebagai referensi cepat dan dapat mengalami halusinasi (*AI Hallucinations*). Jangan jadikan panduan utama. Selalu verifikasi dosis obat pada dokumen rekam medis asli di bawah.
+                    </p>
+                  </div>
                 </CardContent>
               </Card>
 
