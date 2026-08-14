@@ -228,12 +228,16 @@ export default function LandingPage() {
                 whileInView={{ opacity: 1, y: 0 }}
                 viewport={{ once: true }}
                 transition={{ delay: 0.05 }}
-                className={`flex flex-col ${item.reverse ? "md:flex-row-reverse" : "md:flex-row"} gap-10 items-center`}
+                whileHover={{ scale: 1.02 }}
+                className={`flex flex-col ${item.reverse ? "md:flex-row-reverse" : "md:flex-row"} gap-10 items-center cursor-default`}
               >
-                <div className={`flex-1 ${item.color} rounded-3xl p-12 flex items-center justify-center min-h-[200px]`}>
-                  <div className={`w-24 h-24 ${item.iconBg} rounded-3xl flex items-center justify-center shadow-sm`}>
+                <div className={`flex-1 ${item.color} rounded-3xl p-12 flex items-center justify-center min-h-[200px] transition-colors duration-300 hover:brightness-95`}>
+                  <motion.div 
+                    whileHover={{ rotate: [0, -10, 10, -10, 10, 0], transition: { duration: 0.5 } }}
+                    className={`w-24 h-24 ${item.iconBg} rounded-3xl flex items-center justify-center shadow-sm`}
+                  >
                     <item.icon className={`w-12 h-12 ${item.iconColor}`} />
-                  </div>
+                  </motion.div>
                 </div>
                 <div className="flex-1">
                   <span className="text-xs font-bold uppercase tracking-widest text-slate-400">Masalah {i + 1}</span>
@@ -292,11 +296,15 @@ export default function LandingPage() {
                 whileInView={{ opacity: 1, y: 0 }}
                 viewport={{ once: true }}
                 transition={{ delay: i * 0.1 }}
-                className={`bg-white rounded-2xl p-8 shadow-sm hover:shadow-md transition-all duration-300 card-hover ${f.accent}`}
+                whileHover={{ y: -8, boxShadow: "0 20px 40px -15px rgba(0,0,0,0.1)" }}
+                className={`bg-white rounded-2xl p-8 shadow-sm transition-all duration-300 cursor-default ${f.accent}`}
               >
-                <div className={`w-12 h-12 ${f.iconBg} rounded-xl flex items-center justify-center mb-5`}>
+                <motion.div 
+                  whileHover={{ scale: 1.1 }}
+                  className={`w-12 h-12 ${f.iconBg} rounded-xl flex items-center justify-center mb-5 transition-colors`}
+                >
                   <f.icon className={`w-6 h-6 ${f.iconColor}`} />
-                </div>
+                </motion.div>
                 <h3 className="text-slate-900 font-bold text-xl mb-3">{f.title}</h3>
                 <p className="text-slate-600 text-sm leading-relaxed">{f.desc}</p>
               </motion.div>
@@ -343,9 +351,15 @@ export default function LandingPage() {
                 whileInView={{ opacity: 1, x: 0 }}
                 viewport={{ once: true }}
                 transition={{ delay: i * 0.12 }}
-                className="flex flex-col sm:flex-row gap-6 bg-white border border-slate-200 rounded-2xl p-7 hover:border-blue-200 hover:shadow-sm transition-all duration-200"
+                whileHover={{ x: 8, backgroundColor: "rgba(248, 250, 252, 0.5)", borderColor: "#bfdbfe" }}
+                className="flex flex-col sm:flex-row gap-6 bg-white border border-slate-200 rounded-2xl p-7 hover:shadow-md transition-all duration-300 cursor-default"
               >
-                <div className="text-5xl font-black text-slate-100 shrink-0 select-none sm:w-16">{step.step}</div>
+                <motion.div 
+                  whileHover={{ scale: 1.1, color: "#3b82f6" }}
+                  className="text-5xl font-black text-slate-100 shrink-0 select-none sm:w-16 transition-colors"
+                >
+                  {step.step}
+                </motion.div>
                 <div className="flex-1">
                   <span className={`text-xs font-bold uppercase tracking-wider px-2.5 py-1 rounded-md ${step.actorColor}`}>{step.actor}</span>
                   <h3 className="text-slate-900 font-bold text-xl mt-3 mb-2">{step.title}</h3>
