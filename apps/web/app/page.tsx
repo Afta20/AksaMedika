@@ -92,22 +92,22 @@ export default function LandingPage() {
             <div>
               <motion.div variants={fadeUp} initial="hidden" animate="visible" custom={0}>
                 <span className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-blue-50 border border-blue-100 text-blue-700 text-sm font-semibold mb-6">
-                  🏥 Healthcare in Society 5.0
+                  🏥 Era Baru Rekam Medis Indonesia
                 </span>
               </motion.div>
 
               <motion.h1 variants={fadeUp} initial="hidden" animate="visible" custom={1}
                 className="text-4xl md:text-5xl lg:text-6xl font-extrabold text-slate-900 leading-[1.1] tracking-tight mb-6">
-                Data kesehatan Anda,{" "}
+                Kendalikan penuh{" "}
                 <span className="text-blue-600 relative">
-                  kendali Anda.
+                  data kesehatan Anda.
                   <span className="absolute -bottom-1 left-0 right-0 h-[3px] bg-blue-200 rounded-full" />
                 </span>
               </motion.h1>
 
               <motion.p variants={fadeUp} initial="hidden" animate="visible" custom={2}
                 className="text-lg text-slate-600 leading-relaxed mb-8 max-w-lg">
-                Aksamedika mengembalikan kedaulatan data kepada pasien. Dokter hanya bisa mengakses rekam medis Anda dengan token waktu terbatas yang Anda buat sendiri.
+                Simpan dan pantau riwayat medis Anda dari berbagai rumah sakit di satu tempat. Dokter hanya bisa mengaksesnya jika Anda berikan izin sementara. Aman, praktis, dan transparan.
               </motion.p>
 
               <motion.div variants={fadeUp} initial="hidden" animate="visible" custom={3}
@@ -183,12 +183,12 @@ export default function LandingPage() {
       <section id="tentang" className="py-24 px-6 bg-white">
         <div className="max-w-6xl mx-auto">
           <motion.div initial={{ opacity: 0, y: 20 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} className="text-center mb-20">
-            <p className="text-blue-600 text-sm font-bold uppercase tracking-widest mb-3">Masalah yang Ada</p>
+            <p className="text-blue-600 text-sm font-bold uppercase tracking-widest mb-3">Kenyataan Saat Ini</p>
             <h2 className="text-3xl md:text-4xl font-extrabold text-slate-900 mb-4">
-              Rekam medis tradisional <br className="hidden sm:block"/>memiliki celah berbahaya.
+              Sistem rekam medis kita <br className="hidden sm:block"/>masih rentan dan tercerai-berai.
             </h2>
             <p className="text-slate-600 text-lg max-w-2xl mx-auto">
-              Sistem yang berpusat pada rumah sakit membuat pasien tidak punya kendali atas data sensitif mereka.
+              Selama ini, data kesehatan Anda tersimpan di server rumah sakit. Anda tidak punya akses, tidak tahu siapa yang membacanya, dan repot memindahkannya.
             </p>
           </motion.div>
 
@@ -196,8 +196,8 @@ export default function LandingPage() {
             {[
               {
                 icon: Eye,
-                title: "Tidak Ada Privasi",
-                desc: "Anda tidak pernah tahu siapa yang mengakses data kesehatan sensitif Anda, kapan, atau dengan tujuan apa. Rekam medis Anda bisa dibaca oleh staf yang tidak Anda kenal.",
+                title: "Siapa yang Melihat Data Anda?",
+                desc: "Pernah merasa khawatir siapa saja petugas yang melihat data penyakit Anda? Di sistem lama, staf bisa saja mengintip rekam medis Anda tanpa Anda ketahui.",
                 color: "bg-rose-50",
                 iconColor: "text-rose-500",
                 iconBg: "bg-rose-100",
@@ -205,8 +205,8 @@ export default function LandingPage() {
               },
               {
                 icon: Database,
-                title: "Data Tersebar di Mana-mana",
-                desc: "Riwayat kesehatan Anda tersimpan di berbagai klinik dan rumah sakit berbeda. Tidak ada pandangan terpadu yang bisa Anda akses sebagai pasien.",
+                title: "Data yang Tercecer",
+                desc: "Pindah klinik berarti harus mengulang tes darah dari awal. Mengapa? Karena riwayat kesehatan Anda terpencar di berbagai laci dan server klinik yang berbeda.",
                 color: "bg-amber-50",
                 iconColor: "text-amber-600",
                 iconBg: "bg-amber-100",
@@ -214,8 +214,8 @@ export default function LandingPage() {
               },
               {
                 icon: Lock,
-                title: "Rentan Terhadap Kebocoran",
-                desc: "EMR yang terpusat di satu server rumah sakit menjadi target menarik bagi peretas. Satu pelanggaran bisa mengekspos data jutaan pasien.",
+                title: "Rawan Kebocoran Data",
+                desc: "Server rumah sakit tersentralisasi sering menjadi target empuk. Sekali server utama mereka diretas, data sensitif jutaan pasien ikut melayang ke tangan hacker.",
                 color: "bg-violet-50",
                 iconColor: "text-violet-600",
                 iconBg: "bg-violet-100",
@@ -252,10 +252,10 @@ export default function LandingPage() {
           <motion.div initial={{ opacity: 0, y: 20 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} className="text-center mb-16">
             <p className="text-blue-600 text-sm font-bold uppercase tracking-widest mb-3">Solusi Aksamedika</p>
             <h2 className="text-3xl md:text-4xl font-extrabold text-slate-900 mb-4">
-              Arsitektur yang berpusat pada pasien.
+              Satu akun untuk melindungi segalanya.
             </h2>
             <p className="text-slate-600 text-lg max-w-2xl mx-auto">
-              Sistem zero-trust di mana persetujuan Anda adalah kunci dari setiap interaksi.
+              Kami menggunakan standar keamanan berlapis. Data Anda dikunci, dan kuncinya selalu ada pada Anda.
             </p>
           </motion.div>
 
@@ -263,24 +263,24 @@ export default function LandingPage() {
             {[
               {
                 icon: Shield,
-                title: "Zero-Trust Security",
-                desc: "Setiap akses membutuhkan persetujuan eksplisit dari pasien. Dokter tidak bisa melihat rekam medis tanpa izin aktif Anda.",
+                title: "Akses 100% Terkendali",
+                desc: "Setiap akses dokter membutuhkan izin langsung dari Anda. Tanpa persetujuan Anda, layar rekam medis akan terkunci rapat.",
                 iconBg: "bg-blue-100",
                 iconColor: "text-blue-600",
                 accent: "border-t-4 border-blue-500",
               },
               {
                 icon: Zap,
-                title: "Token Akses 30 Menit",
-                desc: "Buat PIN 6-digit + QR Code yang otomatis kedaluwarsa. Tidak ada akses permanen yang diberikan kepada siapapun.",
+                title: "Sesi Waktu Terbatas",
+                desc: "Sistem akan menghasilkan PIN & QR Code yang akan kedaluwarsa otomatis dalam 30 menit. Tidak ada jalur masuk permanen yang tersisa.",
                 iconBg: "bg-emerald-100",
                 iconColor: "text-emerald-600",
                 accent: "border-t-4 border-emerald-500",
               },
               {
                 icon: Activity,
-                title: "Audit Trail Lengkap",
-                desc: "Setiap akses dokter dicatat secara permanen. Anda bisa melihat siapa, kapan, dan melalui metode apa data Anda diakses.",
+                title: "Rekam Jejak Transparan",
+                desc: "Di dashboard, Anda bisa memantau layaknya CCTV. Lihat dokter mana yang mengakses data Anda, pada jam berapa, dan lewat pintu mana.",
                 iconBg: "bg-violet-100",
                 iconColor: "text-violet-600",
                 accent: "border-t-4 border-violet-500",
@@ -310,7 +310,7 @@ export default function LandingPage() {
         <div className="max-w-5xl mx-auto">
           <motion.div initial={{ opacity: 0, y: 20 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} className="text-center mb-16">
             <p className="text-blue-600 text-sm font-bold uppercase tracking-widest mb-3">Cara Kerja</p>
-            <h2 className="text-3xl md:text-4xl font-extrabold text-slate-900">Mudah. Aman. 3 Langkah.</h2>
+            <h2 className="text-3xl md:text-4xl font-extrabold text-slate-900">Semudah scan QR, seaman brankas.</h2>
           </motion.div>
 
           <div className="space-y-4">
@@ -319,22 +319,22 @@ export default function LandingPage() {
                 step: "01",
                 actor: "Pasien",
                 actorColor: "bg-blue-100 text-blue-700",
-                title: "Buat Token Akses",
-                desc: "Buka Aksamedika → ketuk 'Buat Akses' → dapatkan PIN 6-digit + QR Code yang valid tepat 30 menit.",
+                title: "Berikan Izin Akses",
+                desc: "Saat berobat, buka HP Anda lalu klik 'Buat Akses'. Anda akan mendapatkan PIN 6 angka dan QR Code yang hanya berlaku 30 menit.",
               },
               {
                 step: "02",
                 actor: "Dokter",
                 actorColor: "bg-emerald-100 text-emerald-700",
-                title: "Masukkan PIN untuk Akses Rekam Medis",
-                desc: "Dokter mengetik PIN di portal mereka. Backend memvalidasi token, mencatat event akses, dan menampilkan rekam medis lengkap.",
+                title: "Dokter Mengakses Data",
+                desc: "Dokter memindai QR Code atau mengetik PIN di komputer mereka. Layar rekam medis terbuka secara otomatis dan terenkripsi.",
               },
               {
                 step: "03",
-                actor: "Pasien",
+                actor: "Sistem",
                 actorColor: "bg-violet-100 text-violet-700",
-                title: "Pantau Siapa yang Mengakses Data Anda",
-                desc: "Dashboard Anda menampilkan audit trail permanen: dokter mana, jam berapa, dan melalui metode apa. Transparansi penuh, selalu.",
+                title: "Tercatat dan Transparan",
+                desc: "Begitu dokter membuka data Anda, sistem langsung menyimpannya ke buku tamu digital. Anda selalu memegang kendali, setiap saat.",
               },
             ].map((step, i) => (
               <motion.div
@@ -378,7 +378,7 @@ export default function LandingPage() {
               </Button>
             </Link>
             <Link href="/auth/register?role=doctor">
-              <Button size="lg" variant="outline" className="border-white/40 text-white hover:bg-blue-700 font-semibold px-10 h-12 text-base rounded-xl w-full sm:w-auto">
+              <Button size="lg" className="bg-transparent border-2 border-white/50 text-white hover:bg-white/10 hover:border-white font-semibold px-10 h-12 text-base rounded-xl w-full sm:w-auto transition-all">
                 Daftar sebagai Dokter
               </Button>
             </Link>
