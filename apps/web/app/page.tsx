@@ -5,7 +5,7 @@ import Link from "next/link";
 import Image from "next/image";
 import {
   Shield, Lock, Eye, Activity, ArrowRight, CheckCircle2,
-  Zap, Database, Menu, X
+  Zap, Database, Menu, X, Hospital
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useState } from "react";
@@ -92,7 +92,7 @@ export default function LandingPage() {
             <div>
               <motion.div variants={fadeUp} initial="hidden" animate="visible" custom={0}>
                 <span className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-blue-50 border border-blue-100 text-blue-700 text-sm font-semibold mb-6">
-                  🏥 Era Baru Rekam Medis Indonesia
+                  <Hospital className="w-4 h-4" /> Era Baru Rekam Medis Indonesia
                 </span>
               </motion.div>
 

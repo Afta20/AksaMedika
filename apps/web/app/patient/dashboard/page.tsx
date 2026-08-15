@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState, useCallback } from "react";
+import { useEffect, useState, useCallback, useRef } from "react";
 import { useRouter } from "next/navigation";
 import { motion, AnimatePresence } from "framer-motion";
 import { Shield, FileText, Clock, Activity, LogOut, Zap, ChevronRight, User, TriangleAlert, QrCode, PowerOff, ShieldCheck, Settings } from "lucide-react";
@@ -39,6 +39,64 @@ export default function PatientDashboard() {
     }
   }, [router]);
 
+  // ── Real-time SSE listener ───────────────────────────────────────────────
+  const ctrlRef = useRef<AbortController | null>(null);
+
+  const startSSE = useCallback((token: string) => {
+    if (typeof window === "undefined") return;
+    // Abort any existing fetch stream before opening a new one
+    ctrlRef.current?.abort();
+
+    const apiBase = process.env.NEXT_PUBLIC_API_URL ?? "";
+
+    // Use fetch-based SSE so we can attach an Authorization header
+    const ctrl = new AbortController();
+    ctrlRef.current = ctrl;
+    fetch(`${apiBase}/api/patient/notify/stream`, {
+      headers: { Authorization: `Bearer ${token}` },
+      signal: ctrl.signal,
+    }).then(async (res) => {
+      if (!res.ok || !res.body) return;
+      const reader = res.body.getReader();
+      const decoder = new TextDecoder();
+      let buffer = "";
+      while (true) {
+        const { done, value } = await reader.read();
+        if (done) break;
+        buffer += decoder.decode(value, { stream: true });
+        // Parse SSE frames separated by double newlines
+        const frames = buffer.split("\n\n");
+        buffer = frames.pop() ?? "";
+        for (const frame of frames) {
+          const lines = frame.split("\n");
+          let eventType = "message";
+          let data = "";
+          for (const line of lines) {
+            if (line.startsWith("event:")) eventType = line.slice(6).trim();
+            if (line.startsWith("data:")) data = line.slice(5).trim();
+          }
+          if (eventType === "access" && data) {
+            try {
+              const payload = JSON.parse(data);
+              const method = payload.access_method as string;
+              const doctor = payload.doctor_name as string;
+              const methodLabel = method === "EMERGENCY"
+                ? "🚨 AKSES DARURAT"
+                : method === "PIN" ? "PIN" : "QR Code";
+              toast.warning(
+                `${methodLabel}: ${doctor} baru saja mengakses rekam medis Anda!`,
+                { duration: 8000 }
+              );
+              // Reload audit log to show the new entry immediately
+              loadData(token);
+            } catch { /* ignore malformed frame */ }
+          }
+        }
+      }
+    }).catch(() => { /* stream closed on unmount */ });
+  }, [loadData]);
+  // ─────────────────────────────────────────────────────────────────────────
+
   useEffect(() => {
     const token = localStorage.getItem("cg_token");
     const userStr = localStorage.getItem("cg_user");
@@ -47,7 +105,12 @@ export default function PatientDashboard() {
     if (u.role !== "patient") { router.push("/auth/login?role=patient"); return; }
     setUser(u);
     loadData(token);
-  }, [router, loadData]);
+    startSSE(token);
+
+    return () => {
+      ctrlRef.current?.abort();
+    };
+  }, [router, loadData, startSSE]);
 
   const handleLogout = () => {
     localStorage.removeItem("cg_token");

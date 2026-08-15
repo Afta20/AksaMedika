@@ -11,6 +11,7 @@ import (
 	"github.com/aksa-medika/api/pkg/consent"
 	"github.com/aksa-medika/api/pkg/db"
 	"github.com/aksa-medika/api/pkg/kiosk"
+	"github.com/aksa-medika/api/pkg/notify"
 	"github.com/aksa-medika/api/pkg/records"
 	"github.com/gin-contrib/cors"
 	"github.com/gin-gonic/gin"
@@ -54,6 +55,8 @@ func init() {
 			recordsHandler := records.NewHandler(pool)
 			auditHandler := audit.NewHandler(pool)
 			kioskHandler := kiosk.NewHandler(pool)
+			// Initialise the SSE singleton with the live DB pool
+			notifyHandler := notify.GetGlobal(pool)
 
 			// Health check route for root URL
 			app.GET("/", func(c *gin.Context) {
@@ -85,6 +88,8 @@ func init() {
 				patient.GET("/settings", authHandler.GetPatientSettings)
 				patient.PUT("/settings", authHandler.UpdatePatientSettings)
 				patient.POST("/revoke-access", consentHandler.RevokeAccess)
+				// Real-time SSE stream for access notifications
+				patient.GET("/notify/stream", notifyHandler.Stream)
 			}
 
 			doctor := apiGroup.Group("/doctor")

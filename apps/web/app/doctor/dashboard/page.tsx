@@ -15,6 +15,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { Label } from "@/components/ui/label";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
+import { Skeleton } from "@/components/ui/skeleton";
 import { toast } from "sonner";
 import { doctorApi } from "@/lib/api";
 import QRScanner from "@/components/QRScanner";
@@ -679,9 +680,28 @@ function DashboardContent() {
               {/* Records List */}
               <div className="space-y-3">
                 {loadingRecords ? (
-                  <div className="flex flex-col items-center justify-center py-20 gap-3 text-slate-500 bg-white rounded-2xl border border-slate-200">
-                    <Loader2 className="w-6 h-6 animate-spin text-blue-600" />
-                    <span className="text-sm font-medium">Memuat rekam medis...</span>
+                  // ✨ Skeleton loaders — mimic the shape of actual record cards
+                  <div className="space-y-3">
+                    {Array.from({ length: 3 }).map((_, i) => (
+                      <Card key={i} className="bg-white border-slate-200 shadow-sm">
+                        <CardContent className="p-5 md:p-6">
+                          <div className="flex flex-col md:flex-row items-start justify-between gap-4">
+                            <div className="flex-1 space-y-3 w-full">
+                              <div className="flex items-center gap-3">
+                                <Skeleton className="h-6 w-2/5 rounded-md" />
+                                <Skeleton className="h-5 w-14 rounded-full" />
+                              </div>
+                              <Skeleton className="h-4 w-3/5 rounded-md" />
+                              <Skeleton className="h-4 w-4/5 rounded-md" />
+                            </div>
+                            <div className="text-right shrink-0 w-full md:w-auto space-y-2">
+                              <Skeleton className="h-4 w-28 rounded-md ml-auto" />
+                              <Skeleton className="h-3 w-20 rounded-md ml-auto" />
+                            </div>
+                          </div>
+                        </CardContent>
+                      </Card>
+                    ))}
                   </div>
                 ) : records.length === 0 ? (
                   <div className="text-center py-16 bg-white border border-slate-200 rounded-2xl shadow-sm">

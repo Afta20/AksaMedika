@@ -8,6 +8,7 @@ import (
 	"net/http"
 	"time"
 
+	"github.com/aksa-medika/api/pkg/notify"
 	"github.com/gin-gonic/gin"
 	"github.com/google/uuid"
 	"github.com/jackc/pgx/v5/pgxpool"
@@ -170,6 +171,9 @@ func (h *Handler) ValidateAccess(c *gin.Context) {
 		fmt.Printf("Failed to write audit log: %v\n", err)
 	}
 
+	// ✅ Push a real-time SSE notification to the patient's browser
+	notify.GetGlobal(nil).PollAndNotify(patientID, doctorName, method)
+
 	c.JSON(http.StatusOK, ValidateAccessResponse{
 		PatientID:   patientID,
 		PatientName: patientName,
@@ -239,6 +243,9 @@ func (h *Handler) EmergencyAccess(c *gin.Context) {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to write emergency audit log"})
 		return
 	}
+
+	// ✅ Push a real-time EMERGENCY SSE notification to the patient's browser
+	notify.GetGlobal(nil).PollAndNotify(patientID, doctorName, "EMERGENCY")
 
 	c.JSON(http.StatusOK, ValidateAccessResponse{
 		PatientID:   patientID,
