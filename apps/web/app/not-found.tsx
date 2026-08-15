@@ -2,109 +2,153 @@
 
 import { motion } from "framer-motion";
 import Link from "next/link";
-import { Shield, ArrowLeft, Home, Search } from "lucide-react";
+import { ArrowLeft, Home, ShieldOff, Wifi } from "lucide-react";
 
 export default function NotFound() {
   return (
     <div
-      className="min-h-screen bg-slate-50 flex flex-col items-center justify-center px-4 text-center"
-      style={{ fontFamily: "'Inter', system-ui, sans-serif" }}
+      className="min-h-screen flex flex-col items-center justify-center px-6 relative overflow-hidden"
+      style={{
+        fontFamily: "'Inter', system-ui, sans-serif",
+        background: "linear-gradient(135deg, #0f172a 0%, #1e293b 50%, #0f172a 100%)",
+      }}
     >
-      {/* Background decoration */}
-      <div className="absolute inset-0 overflow-hidden pointer-events-none">
-        <div className="absolute top-1/4 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[600px] h-[600px] bg-blue-100/50 rounded-full blur-3xl" />
+      {/* Animated background orbs */}
+      <div className="absolute inset-0 pointer-events-none overflow-hidden">
+        <motion.div
+          animate={{ scale: [1, 1.15, 1], opacity: [0.15, 0.25, 0.15] }}
+          transition={{ duration: 6, repeat: Infinity, ease: "easeInOut" }}
+          className="absolute top-1/4 left-1/4 w-96 h-96 bg-blue-600 rounded-full blur-3xl"
+        />
+        <motion.div
+          animate={{ scale: [1.1, 1, 1.1], opacity: [0.1, 0.18, 0.1] }}
+          transition={{ duration: 8, repeat: Infinity, ease: "easeInOut", delay: 1.5 }}
+          className="absolute bottom-1/4 right-1/4 w-80 h-80 bg-violet-600 rounded-full blur-3xl"
+        />
+        {/* Grid pattern overlay */}
+        <div
+          className="absolute inset-0 opacity-[0.04]"
+          style={{
+            backgroundImage: `linear-gradient(rgba(148,163,184,1) 1px, transparent 1px), linear-gradient(90deg, rgba(148,163,184,1) 1px, transparent 1px)`,
+            backgroundSize: "40px 40px",
+          }}
+        />
       </div>
 
-      <div className="relative z-10 max-w-md w-full">
+      <div className="relative z-10 text-center max-w-lg w-full">
+
         {/* Logo */}
         <motion.div
-          initial={{ opacity: 0, y: -16 }}
+          initial={{ opacity: 0, y: -20 }}
           animate={{ opacity: 1, y: 0 }}
-          className="flex items-center justify-center gap-2.5 mb-12"
+          className="flex items-center justify-center gap-2.5 mb-16"
         >
-          <div className="w-10 h-10 bg-blue-600 rounded-xl flex items-center justify-center shadow-sm p-1">
-            <img
-              src="/aksamedika.svg"
-              alt="Aksamedika"
-              className="w-full h-full object-contain invert brightness-0"
-            />
+          <div className="w-9 h-9 bg-blue-500 rounded-xl flex items-center justify-center p-1.5 shadow-lg shadow-blue-500/30">
+            <img src="/aksamedika.svg" alt="Aksamedika" className="w-full h-full object-contain invert brightness-0" />
           </div>
-          <span className="font-bold text-slate-900 text-xl tracking-tight">
-            Aksa<span className="text-blue-600">medika</span>
+          <span className="font-bold text-white text-lg tracking-tight">
+            Aksa<span className="text-blue-400">medika</span>
           </span>
         </motion.div>
 
-        {/* 404 Illustration */}
+        {/* Central icon */}
         <motion.div
-          initial={{ opacity: 0, scale: 0.9 }}
+          initial={{ opacity: 0, scale: 0.8 }}
           animate={{ opacity: 1, scale: 1 }}
-          transition={{ delay: 0.05, duration: 0.5, ease: [0.22, 1, 0.36, 1] }}
-          className="mb-8"
+          transition={{ delay: 0.08, duration: 0.6, ease: [0.22, 1, 0.36, 1] }}
+          className="mb-10 flex justify-center"
         >
-          {/* Lock icon in a card, representing a forbidden/missing page */}
-          <div className="w-32 h-32 bg-white rounded-3xl shadow-lg border border-slate-200 flex items-center justify-center mx-auto mb-6 relative">
-            <div className="absolute inset-0 rounded-3xl bg-gradient-to-br from-blue-50 to-slate-50" />
-            <Shield className="w-16 h-16 text-slate-200 relative z-10" />
-            <div className="absolute top-3 right-3 w-6 h-6 bg-rose-100 rounded-full flex items-center justify-center">
-              <Search className="w-3 h-3 text-rose-500" />
+          <div className="relative">
+            {/* Pulsing ring */}
+            <motion.div
+              animate={{ scale: [1, 1.2, 1], opacity: [0.3, 0, 0.3] }}
+              transition={{ duration: 2.5, repeat: Infinity }}
+              className="absolute inset-0 rounded-full bg-blue-500/30"
+            />
+            <div className="w-24 h-24 bg-white/5 border border-white/10 rounded-full flex items-center justify-center backdrop-blur-sm shadow-xl">
+              <ShieldOff className="w-10 h-10 text-blue-400" strokeWidth={1.5} />
             </div>
           </div>
+        </motion.div>
 
-          {/* 404 Number */}
-          <div className="flex items-center justify-center gap-3 mb-4">
-            <span className="text-8xl font-black text-slate-100 tracking-tight select-none leading-none">4</span>
-            <div className="w-16 h-16 bg-blue-600 rounded-2xl flex items-center justify-center shadow-lg shadow-blue-600/30">
-              <span className="text-3xl font-black text-white">0</span>
-            </div>
-            <span className="text-8xl font-black text-slate-100 tracking-tight select-none leading-none">4</span>
-          </div>
+        {/* 404 Number */}
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.15 }}
+          className="mb-6"
+        >
+          <p
+            className="text-[120px] font-black leading-none tracking-tighter select-none"
+            style={{
+              background: "linear-gradient(135deg, #93c5fd 0%, #6366f1 50%, #8b5cf6 100%)",
+              WebkitBackgroundClip: "text",
+              WebkitTextFillColor: "transparent",
+              backgroundClip: "text",
+            }}
+          >
+            404
+          </p>
         </motion.div>
 
         {/* Text */}
         <motion.div
           initial={{ opacity: 0, y: 16 }}
           animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 0.15 }}
+          transition={{ delay: 0.22 }}
+          className="mb-10"
         >
-          <h1 className="text-2xl font-extrabold text-slate-900 mb-3">
+          <h1 className="text-2xl font-extrabold text-white mb-3">
             Halaman Tidak Ditemukan
           </h1>
-          <p className="text-slate-500 leading-relaxed mb-8 max-w-sm mx-auto">
-            Sepertinya halaman yang Anda cari tidak ada, sudah dipindahkan, atau membutuhkan izin akses khusus.
+          <p className="text-slate-400 leading-relaxed max-w-sm mx-auto text-sm">
+            Akses ke halaman ini tidak tersedia — mungkin sudah dipindahkan, atau membutuhkan izin khusus untuk masuk.
           </p>
+        </motion.div>
+
+        {/* Divider with icon */}
+        <motion.div
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          transition={{ delay: 0.28 }}
+          className="flex items-center gap-3 justify-center mb-10"
+        >
+          <div className="h-px w-16 bg-white/10" />
+          <Wifi className="w-3.5 h-3.5 text-slate-600" />
+          <div className="h-px w-16 bg-white/10" />
         </motion.div>
 
         {/* Action buttons */}
         <motion.div
           initial={{ opacity: 0, y: 16 }}
           animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 0.22 }}
+          transition={{ delay: 0.3 }}
           className="flex flex-col sm:flex-row gap-3 justify-center"
         >
           <Link
             href="/"
-            className="inline-flex items-center justify-center gap-2 px-6 py-3 bg-blue-600 hover:bg-blue-700 text-white font-bold rounded-xl shadow-md shadow-blue-600/25 transition-all duration-200"
+            className="inline-flex items-center justify-center gap-2 px-7 py-3 bg-blue-600 hover:bg-blue-500 text-white font-bold rounded-xl shadow-lg shadow-blue-600/30 transition-all duration-200 hover:shadow-blue-500/40 hover:-translate-y-0.5"
           >
             <Home className="w-4 h-4" />
             Kembali ke Beranda
           </Link>
           <button
             onClick={() => window.history.back()}
-            className="inline-flex items-center justify-center gap-2 px-6 py-3 bg-white hover:bg-slate-50 text-slate-700 font-semibold rounded-xl border border-slate-200 transition-all duration-200"
+            className="inline-flex items-center justify-center gap-2 px-7 py-3 bg-white/5 hover:bg-white/10 text-slate-300 hover:text-white font-semibold rounded-xl border border-white/10 hover:border-white/20 transition-all duration-200"
           >
             <ArrowLeft className="w-4 h-4" />
             Halaman Sebelumnya
           </button>
         </motion.div>
 
-        {/* Footer note */}
+        {/* Footer */}
         <motion.p
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
-          transition={{ delay: 0.35 }}
-          className="text-xs text-slate-400 font-medium mt-10"
+          transition={{ delay: 0.4 }}
+          className="text-slate-600 text-xs font-medium mt-14 tracking-wide"
         >
-          Kode Error: 404 · Aksamedika Zero-Trust Platform
+          Error 404 · Aksamedika Zero-Trust Security Platform
         </motion.p>
       </div>
     </div>

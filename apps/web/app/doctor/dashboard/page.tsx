@@ -7,7 +7,7 @@ import {
   Shield, LogOut, Stethoscope, Users, Search, ChevronRight,
   Loader2, CheckCircle2, AlertCircle, FileText, Calendar, Pill,
   ClipboardList, Lock, Activity, Plus, X, User as UserIcon, Clock,
-  QrCode, Zap, Sparkles, TriangleAlert
+  QrCode, Zap, Sparkles, TriangleAlert, Download
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -22,6 +22,117 @@ import QRScanner from "@/components/QRScanner";
 import type { MedicalRecord, ValidateAccessResponse, DoctorProfile, DoctorStats, DoctorHistoryEntry, User as UserType } from "@/types/api";
 
 type PortalState = "idle" | "loading" | "success" | "error";
+
+// ✨ Tier 2.1 — PDF Export helper
+async function exportRecordToPDF(record: MedicalRecord, patientName: string, doctorName: string) {
+  const { jsPDF } = await import("jspdf");
+  const doc = new jsPDF({ unit: "mm", format: "a4" });
+
+  const margin = 20;
+  const pageW = 210;
+  const col = pageW - margin * 2;
+  let y = margin;
+
+  // — Header bar
+  doc.setFillColor(37, 99, 235); // blue-600
+  doc.rect(0, 0, pageW, 28, "F");
+  doc.setTextColor(255, 255, 255);
+  doc.setFont("helvetica", "bold");
+  doc.setFontSize(14);
+  doc.text("Aksamedika", margin, 12);
+  doc.setFont("helvetica", "normal");
+  doc.setFontSize(8);
+  doc.text("Zero-Trust Electronic Medical Record", margin, 19);
+  doc.setFontSize(7);
+  doc.text(`Dicetak: ${new Date().toLocaleString("id-ID")}`, pageW - margin, 19, { align: "right" });
+
+  y = 40;
+
+  // — Patient Info box
+  doc.setFillColor(248, 250, 252); // slate-50
+  doc.roundedRect(margin, y, col, 22, 3, 3, "F");
+  doc.setTextColor(15, 23, 42);
+  doc.setFont("helvetica", "bold");
+  doc.setFontSize(9);
+  doc.text("INFORMASI PASIEN", margin + 5, y + 7);
+  doc.setFont("helvetica", "normal");
+  doc.setFontSize(9);
+  doc.text(`Nama: ${patientName}`, margin + 5, y + 14);
+  doc.text(`Dokter: dr. ${doctorName}`, margin + 90, y + 14);
+  y += 30;
+
+  // — Section: Diagnosis
+  doc.setFont("helvetica", "bold");
+  doc.setFontSize(11);
+  doc.setTextColor(37, 99, 235);
+  doc.text(record.diagnosis, margin, y);
+  if (record.icd_code) {
+    doc.setFontSize(8);
+    doc.setTextColor(100, 116, 139);
+    doc.text(`ICD: ${record.icd_code}`, margin, y + 6);
+    y += 6;
+  }
+  y += 8;
+
+  // — Divider
+  doc.setDrawColor(226, 232, 240);
+  doc.setLineWidth(0.3);
+  doc.line(margin, y, pageW - margin, y);
+  y += 6;
+
+  // — Visit date
+  doc.setFont("helvetica", "bold");
+  doc.setFontSize(8);
+  doc.setTextColor(71, 85, 105);
+  doc.text("Tanggal Kunjungan", margin, y);
+  doc.setFont("helvetica", "normal");
+  doc.text(
+    new Date(record.visit_date).toLocaleDateString("id-ID", { day: "numeric", month: "long", year: "numeric" }),
+    margin + 45, y
+  );
+  y += 10;
+
+  // — Prescription
+  if (record.prescription) {
+    doc.setFont("helvetica", "bold");
+    doc.setFontSize(8);
+    doc.setTextColor(71, 85, 105);
+    doc.text("Resep", margin, y);
+    doc.setFont("helvetica", "normal");
+    doc.setTextColor(15, 23, 42);
+    const presLines = doc.splitTextToSize(record.prescription, col - 45);
+    doc.text(presLines, margin + 45, y);
+    y += presLines.length * 5 + 5;
+  }
+
+  // — Notes
+  if (record.notes) {
+    doc.setFont("helvetica", "bold");
+    doc.setFontSize(8);
+    doc.setTextColor(71, 85, 105);
+    doc.text("Catatan Medis", margin, y);
+    doc.setFont("helvetica", "normal");
+    doc.setTextColor(15, 23, 42);
+    const noteLines = doc.splitTextToSize(record.notes, col - 45);
+    doc.text(noteLines, margin + 45, y);
+    y += noteLines.length * 5 + 5;
+  }
+
+  // — Watermark (subtle)
+  doc.setTextColor(226, 232, 240);
+  doc.setFont("helvetica", "bold");
+  doc.setFontSize(48);
+  doc.text("AKSAMEDIKA", pageW / 2, 180, { align: "center", angle: 45 });
+
+  // — Footer
+  doc.setTextColor(148, 163, 184);
+  doc.setFont("helvetica", "normal");
+  doc.setFontSize(7);
+  doc.text("Dokumen ini dihasilkan secara digital oleh Aksamedika · Zero-Trust Medical Platform", margin, 285);
+  doc.text("Dokumen ini sah tanpa tanda tangan jika diverifikasi melalui sistem Aksamedika.", margin, 289);
+
+  doc.save(`rekam-medis-${patientName.replace(/\s+/g, "-").toLowerCase()}-${record.id.slice(0, 8)}.pdf`);
+}
 
 function DashboardContent() {
   const router = useRouter();
@@ -747,16 +858,33 @@ function DashboardContent() {
                               </div>
                             </div>
                             
-                            <div className="text-left md:text-right shrink-0 w-full md:w-auto pt-4 md:pt-0 border-t md:border-0 border-slate-100 mt-2 md:mt-0">
+                            <div className="text-left md:text-right shrink-0 w-full md:w-auto pt-4 md:pt-0 border-t md:border-0 border-slate-100 mt-2 md:mt-0 space-y-2">
                               <div className="flex items-center md:justify-end gap-1.5 text-slate-900 font-bold text-sm">
                                 <Calendar className="w-4 h-4 text-slate-400" />
                                 {new Date(r.visit_date).toLocaleDateString("id-ID", { day: "numeric", month: "long", year: "numeric" })}
                               </div>
                               {r.doctor_name && (
-                                <p className="text-slate-500 text-xs mt-1.5 font-medium flex items-center md:justify-end gap-1.5">
+                                <p className="text-slate-500 text-xs font-medium flex items-center md:justify-end gap-1.5">
                                   <Stethoscope className="w-3 h-3" /> dr. {r.doctor_name}
                                 </p>
                               )}
+                              {/* ✨ Tier 2.1 — Export PDF Button */}
+                              <button
+                                onClick={() => {
+                                  toast.promise(
+                                    exportRecordToPDF(r, patient?.patient_name ?? "Pasien", profile?.name ?? "Dokter"),
+                                    {
+                                      loading: "Menyiapkan PDF...",
+                                      success: "PDF berhasil diunduh!",
+                                      error: "Gagal mengekspor PDF.",
+                                    }
+                                  );
+                                }}
+                                className="inline-flex items-center gap-1.5 text-xs font-semibold text-slate-400 hover:text-blue-600 transition-colors px-2 py-1 rounded-lg hover:bg-blue-50 md:ml-auto"
+                              >
+                                <Download className="w-3.5 h-3.5" />
+                                Export PDF
+                              </button>
                             </div>
                           </div>
                         </CardContent>

@@ -384,65 +384,130 @@ export default function PatientDashboard() {
                 </div>
               </motion.div>
 
-              {/* Audit Trail */}
+              {/* Audit Trail — Vertical Timeline */}
               <motion.div initial={{ opacity: 0, y: 16 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.35 }}
                 className="bg-white border border-slate-200 rounded-2xl shadow-sm p-6 flex flex-col h-full">
-                <div className="flex items-center gap-3 mb-6">
-                  <div className="w-8 h-8 bg-emerald-50 rounded-lg flex items-center justify-center">
-                    <Shield className="w-4 h-4 text-emerald-600" />
+                <div className="flex items-center justify-between gap-3 mb-6">
+                  <div className="flex items-center gap-3">
+                    <div className="w-8 h-8 bg-emerald-50 rounded-lg flex items-center justify-center">
+                      <Shield className="w-4 h-4 text-emerald-600" />
+                    </div>
+                    <h2 className="text-slate-900 font-bold text-base">Riwayat Akses</h2>
                   </div>
-                  <h2 className="text-slate-900 font-bold text-base">Audit Trail</h2>
+                  {!loading && auditLogs.length > 0 && (
+                    <span className="text-[10px] font-bold text-slate-400 uppercase tracking-widest">{auditLogs.length} log</span>
+                  )}
                 </div>
-                
-                <div className="flex-1 space-y-3">
+
+                <div className="flex-1">
                   {loading ? (
-                    Array.from({length: 4}).map((_, i) => <Skeleton key={i} className="h-16 w-full rounded-xl" />)
+                    <div className="space-y-4">
+                      {Array.from({length: 3}).map((_, i) => <Skeleton key={i} className="h-16 w-full rounded-xl" />)}
+                    </div>
                   ) : auditLogs.length === 0 ? (
                     <div className="h-full flex flex-col items-center justify-center text-center py-8">
                       <div className="w-16 h-16 bg-slate-50 rounded-full flex items-center justify-center mb-3 border border-dashed border-slate-200">
                         <Clock className="w-6 h-6 text-slate-300" />
                       </div>
-                      <p className="text-slate-500 text-sm font-medium">Log akses kosong</p>
+                      <p className="text-slate-500 text-sm font-medium">Belum ada riwayat akses</p>
+                      <p className="text-slate-400 text-xs mt-1">Log akan muncul setelah dokter mengakses data Anda</p>
                     </div>
                   ) : (
-                    auditLogs.slice(0, 4).map((log, i) => (
-                      <div key={log.id} className="flex items-center justify-between p-3 rounded-xl bg-slate-50 border border-slate-100 hover:bg-slate-100 transition-colors">
-                        <div className="flex items-center gap-3">
-                          <div className={`w-8 h-8 rounded-full flex items-center justify-center shrink-0 ${
-                            log.access_method === "EMERGENCY" ? "bg-rose-100" : "bg-white border border-slate-200"
-                          }`}>
-                            {log.access_method === "EMERGENCY" ? (
-                              <TriangleAlert className="w-3.5 h-3.5 text-rose-600" />
-                            ) : (
-                              <User className="w-3.5 h-3.5 text-slate-500" />
-                            )}
-                          </div>
-                          <div>
-                            <p className={`font-bold text-xs ${log.access_method === "EMERGENCY" ? "text-rose-600" : "text-slate-900"}`}>
-                              {log.doctor_name}
-                            </p>
-                            <p className="text-slate-500 text-[10px] mt-0.5 font-medium">
-                              {formatDistanceToNow(new Date(log.accessed_at), { addSuffix: true })}
-                            </p>
-                          </div>
-                        </div>
-                        <Badge className={`text-[9px] px-1.5 py-0.5 rounded shadow-none uppercase font-bold tracking-wider ${
-                          log.access_method === "PIN"
-                            ? "bg-blue-100 text-blue-700"
-                            : log.access_method === "QR"
-                            ? "bg-emerald-100 text-emerald-700"
-                            : "bg-rose-100 text-rose-700"
-                        }`}>
-                          {log.access_method}
-                        </Badge>
+                    // ✨ Tier 2.2 — Vertical Timeline View
+                    <div className="relative">
+                      {/* Vertical line */}
+                      <div className="absolute left-[15px] top-2 bottom-2 w-px bg-slate-100" />
+
+                      <div className="space-y-4">
+                        {auditLogs.slice(0, 5).map((log, i) => {
+                          const isEmergency = log.access_method === "EMERGENCY";
+                          const isRevoked   = log.access_method === "REVOKED";
+                          const isQR        = log.access_method === "QR";
+
+                          const dotColor = isEmergency
+                            ? "bg-rose-500 ring-rose-200"
+                            : isRevoked
+                            ? "bg-slate-400 ring-slate-100"
+                            : isQR
+                            ? "bg-emerald-500 ring-emerald-200"
+                            : "bg-blue-500 ring-blue-200";
+
+                          const badgeStyle = isEmergency
+                            ? "bg-rose-50 text-rose-700 border-rose-200"
+                            : isRevoked
+                            ? "bg-slate-100 text-slate-500 border-slate-200"
+                            : isQR
+                            ? "bg-emerald-50 text-emerald-700 border-emerald-200"
+                            : "bg-blue-50 text-blue-700 border-blue-200";
+
+                          const methodIcon = isEmergency ? (
+                            <TriangleAlert className="w-3 h-3" />
+                          ) : isQR ? (
+                            <QrCode className="w-3 h-3" />
+                          ) : isRevoked ? (
+                            <Shield className="w-3 h-3" />
+                          ) : (
+                            <Activity className="w-3 h-3" />
+                          );
+
+                          // ✨ Tier 2.3 — Verified SIP badge: doctor_name without EMERGENCY suffix
+                          const rawName = log.doctor_name?.replace(/ \(EMERGENCY:.*\)$/, "") ?? "";
+
+                          return (
+                            <motion.div
+                              key={log.id}
+                              initial={{ opacity: 0, x: -8 }}
+                              animate={{ opacity: 1, x: 0 }}
+                              transition={{ delay: i * 0.06 }}
+                              className="flex gap-4 pl-2"
+                            >
+                              {/* Timeline dot */}
+                              <div className={`relative z-10 w-[14px] h-[14px] rounded-full ring-4 shrink-0 mt-1.5 ${dotColor}`} />
+
+                              {/* Content card */}
+                              <div className={`flex-1 rounded-xl border p-3 transition-all hover:shadow-sm ${
+                                isEmergency
+                                  ? "bg-rose-50/50 border-rose-100"
+                                  : isRevoked
+                                  ? "bg-slate-50 border-slate-100"
+                                  : "bg-slate-50 border-slate-100 hover:border-blue-200 hover:bg-blue-50/30"
+                              }`}>
+                                <div className="flex items-start justify-between gap-2">
+                                  <div className="flex-1 min-w-0">
+                                    <div className="flex items-center gap-1.5 flex-wrap">
+                                      <p className={`font-bold text-xs truncate ${
+                                        isEmergency ? "text-rose-700" : "text-slate-900"
+                                      }`}>
+                                        {rawName}
+                                      </p>
+                                      {/* ✨ Tier 2.3: Verified SIP badge for all non-revoked doctors */}
+                                      {!isRevoked && (
+                                        <span className="inline-flex items-center gap-0.5 px-1.5 py-0.5 rounded bg-blue-50 border border-blue-100 text-[9px] font-bold text-blue-600 shrink-0">
+                                          <ShieldCheck className="w-2.5 h-2.5" /> Terverifikasi
+                                        </span>
+                                      )}
+                                    </div>
+                                    <p className="text-slate-400 text-[10px] mt-0.5">
+                                      {formatDistanceToNow(new Date(log.accessed_at), { addSuffix: true })}
+                                    </p>
+                                  </div>
+                                  <span className={`inline-flex items-center gap-1 px-1.5 py-0.5 rounded border text-[9px] font-bold uppercase tracking-wider shrink-0 ${badgeStyle}`}>
+                                    {methodIcon}
+                                    {log.access_method}
+                                  </span>
+                                </div>
+                              </div>
+                            </motion.div>
+                          );
+                        })}
                       </div>
-                    ))
+                    </div>
                   )}
                 </div>
-                
-                {!loading && auditLogs.length > 0 && (
-                  <button className="w-full mt-4 py-2 text-xs font-bold text-slate-500 hover:text-blue-600 transition-colors">
-                    Lihat Semua Log →
+
+                {!loading && auditLogs.length > 5 && (
+                  <button className="w-full mt-4 py-2 text-xs font-bold text-slate-400 hover:text-blue-600 transition-colors">
+                    Lihat Semua {auditLogs.length} Log →
                   </button>
                 )}
               </motion.div>
