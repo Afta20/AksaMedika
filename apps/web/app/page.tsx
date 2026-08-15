@@ -10,6 +10,7 @@ import {
 import { Button } from "@/components/ui/button";
 import { useState } from "react";
 import type { Variants } from "framer-motion";
+import { ThemeToggle } from "@/components/ThemeToggle";
 
 const fadeUp: Variants = {
   hidden: { opacity: 0, y: 28 },
@@ -28,18 +29,18 @@ export default function LandingPage() {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
 
   return (
-    <div className="min-h-screen bg-white" style={{ fontFamily: "'Inter', system-ui, sans-serif" }}>
+    <div className="min-h-screen bg-background text-foreground transition-colors duration-300" style={{ fontFamily: "'Inter', system-ui, sans-serif" }}>
 
       {/* ===== NAVBAR ===== */}
-      <nav className="fixed top-0 left-0 right-0 z-50 bg-white/95 backdrop-blur-md border-b border-slate-100">
+      <nav className="fixed top-0 left-0 right-0 z-50 bg-white/95 dark:bg-slate-950/95 backdrop-blur-md border-b border-slate-100 dark:border-slate-800 transition-colors duration-300">
         <div className="max-w-7xl mx-auto px-6 h-16 flex items-center justify-between">
           {/* Logo */}
           <Link href="/" className="flex items-center gap-2.5">
             <div className="w-10 h-10 rounded-xl bg-blue-600 flex items-center justify-center shadow-sm p-1">
               <img src="/aksamedika.svg" alt="Logo" className="w-full h-full object-contain invert brightness-0" />
             </div>
-            <span className="text-slate-900 font-bold text-lg tracking-tight">
-              Aksa<span className="text-blue-600">medika</span>
+            <span className="text-slate-900 dark:text-white font-bold text-lg tracking-tight transition-colors">
+              Aksa<span className="text-blue-600 dark:text-blue-400">medika</span>
             </span>
           </Link>
 
@@ -52,8 +53,9 @@ export default function LandingPage() {
 
           {/* Desktop CTA */}
           <div className="hidden md:flex items-center gap-3">
+            <ThemeToggle />
             <Link href="/auth/login?role=doctor">
-              <Button variant="ghost" size="sm" className="text-slate-700 hover:text-blue-700 hover:bg-blue-50 font-semibold">
+              <Button variant="ghost" size="sm" className="text-slate-700 dark:text-slate-300 hover:text-blue-700 dark:hover:text-blue-400 hover:bg-blue-50 dark:hover:bg-blue-900/50 font-semibold">
                 Portal Dokter
               </Button>
             </Link>
@@ -73,7 +75,8 @@ export default function LandingPage() {
         {/* Mobile Menu */}
         {mobileMenuOpen && (
           <motion.div initial={{ opacity: 0, y: -8 }} animate={{ opacity: 1, y: 0 }}
-            className="md:hidden border-t border-slate-100 bg-white px-6 py-4 space-y-3">
+            className="md:hidden border-t border-slate-100 dark:border-slate-800 bg-white dark:bg-slate-950 px-6 py-4 space-y-3">
+            <div className="flex justify-end mb-2"><ThemeToggle /></div>
             <Link href="/auth/login?role=patient" className="block w-full">
               <Button className="w-full bg-blue-600 hover:bg-blue-700 text-white font-bold rounded-lg">Masuk sebagai Pasien</Button>
             </Link>
@@ -85,7 +88,7 @@ export default function LandingPage() {
       </nav>
 
       {/* ===== HERO ===== */}
-      <section className="pt-24 pb-16 md:pt-32 md:pb-24 px-6 bg-gradient-to-b from-blue-50/70 via-white to-white overflow-hidden">
+      <section className="pt-24 pb-16 md:pt-32 md:pb-24 px-6 bg-gradient-to-b from-blue-50/70 via-white to-white dark:from-blue-900/20 dark:via-background dark:to-background overflow-hidden transition-colors duration-300">
         <div className="max-w-7xl mx-auto">
           <div className="grid md:grid-cols-2 gap-12 items-center">
             {/* Left: Text */}
@@ -97,16 +100,16 @@ export default function LandingPage() {
               </motion.div>
 
               <motion.h1 variants={fadeUp} initial="hidden" animate="visible" custom={1}
-                className="text-4xl md:text-5xl lg:text-6xl font-extrabold text-slate-900 leading-[1.1] tracking-tight mb-6">
+                className="text-4xl md:text-5xl lg:text-6xl font-extrabold text-slate-900 dark:text-white leading-[1.1] tracking-tight mb-6 transition-colors">
                 Kendalikan penuh{" "}
-                <span className="text-blue-600 relative">
+                <span className="text-blue-600 dark:text-blue-400 relative">
                   data kesehatan Anda.
-                  <span className="absolute -bottom-1 left-0 right-0 h-[3px] bg-blue-200 rounded-full" />
+                  <span className="absolute -bottom-1 left-0 right-0 h-[3px] bg-blue-200 dark:bg-blue-800 rounded-full" />
                 </span>
               </motion.h1>
 
               <motion.p variants={fadeUp} initial="hidden" animate="visible" custom={2}
-                className="text-lg text-slate-600 leading-relaxed mb-8 max-w-lg">
+                className="text-lg text-slate-600 dark:text-slate-300 leading-relaxed mb-8 max-w-lg transition-colors">
                 Simpan dan pantau riwayat medis Anda dari berbagai rumah sakit di satu tempat. Dokter hanya bisa mengaksesnya jika Anda berikan izin sementara. Aman, praktis, dan transparan.
               </motion.p>
 
@@ -180,11 +183,11 @@ export default function LandingPage() {
       </section>
 
       {/* ===== PROBLEM (Alternating) ===== */}
-      <section id="tentang" className="py-24 px-6 bg-white">
+      <section id="tentang" className="py-24 px-6 bg-background transition-colors duration-300">
         <div className="max-w-6xl mx-auto">
           <motion.div initial={{ opacity: 0, y: 20 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} className="text-center mb-20">
-            <p className="text-blue-600 text-sm font-bold uppercase tracking-widest mb-3">Kenyataan Saat Ini</p>
-            <h2 className="text-3xl md:text-4xl font-extrabold text-slate-900 mb-4">
+            <p className="text-blue-600 dark:text-blue-400 text-sm font-bold uppercase tracking-widest mb-3">Kenyataan Saat Ini</p>
+            <h2 className="text-3xl md:text-4xl font-extrabold text-slate-900 dark:text-white mb-4 transition-colors">
               Sistem rekam medis kita <br className="hidden sm:block"/>masih rentan dan tercerai-berai.
             </h2>
             <p className="text-slate-600 text-lg max-w-2xl mx-auto">
@@ -240,9 +243,9 @@ export default function LandingPage() {
                   </motion.div>
                 </div>
                 <div className="flex-1">
-                  <span className="text-xs font-bold uppercase tracking-widest text-slate-400">Masalah {i + 1}</span>
-                  <h3 className="text-2xl md:text-3xl font-extrabold text-slate-900 mt-2 mb-4">{item.title}</h3>
-                  <p className="text-slate-600 text-lg leading-relaxed">{item.desc}</p>
+                  <span className="text-xs font-bold uppercase tracking-widest text-slate-400 dark:text-slate-500">Masalah {i + 1}</span>
+                  <h3 className="text-2xl md:text-3xl font-extrabold text-slate-900 dark:text-white mt-2 mb-4 transition-colors">{item.title}</h3>
+                  <p className="text-slate-600 dark:text-slate-300 text-lg leading-relaxed transition-colors">{item.desc}</p>
                 </div>
               </motion.div>
             ))}
@@ -251,14 +254,14 @@ export default function LandingPage() {
       </section>
 
       {/* ===== SOLUTION FEATURES ===== */}
-      <section id="fitur" className="py-24 px-6 bg-slate-50">
+      <section id="fitur" className="py-24 px-6 bg-slate-50 dark:bg-slate-900/50 transition-colors duration-300">
         <div className="max-w-6xl mx-auto">
           <motion.div initial={{ opacity: 0, y: 20 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} className="text-center mb-16">
-            <p className="text-blue-600 text-sm font-bold uppercase tracking-widest mb-3">Solusi Aksamedika</p>
-            <h2 className="text-3xl md:text-4xl font-extrabold text-slate-900 mb-4">
+            <p className="text-blue-600 dark:text-blue-400 text-sm font-bold uppercase tracking-widest mb-3">Solusi Aksamedika</p>
+            <h2 className="text-3xl md:text-4xl font-extrabold text-slate-900 dark:text-white mb-4 transition-colors">
               Satu akun untuk melindungi segalanya.
             </h2>
-            <p className="text-slate-600 text-lg max-w-2xl mx-auto">
+            <p className="text-slate-600 dark:text-slate-300 text-lg max-w-2xl mx-auto transition-colors">
               Kami menggunakan standar keamanan berlapis. Data Anda dikunci, dan kuncinya selalu ada pada Anda.
             </p>
           </motion.div>
@@ -297,16 +300,16 @@ export default function LandingPage() {
                 viewport={{ once: true }}
                 transition={{ delay: i * 0.1 }}
                 whileHover={{ y: -8, boxShadow: "0 20px 40px -15px rgba(0,0,0,0.1)" }}
-                className={`bg-white rounded-2xl p-8 shadow-sm transition-all duration-300 cursor-default ${f.accent}`}
+                className={`bg-white dark:bg-slate-950 rounded-2xl p-8 shadow-sm transition-all duration-300 cursor-default ${f.accent} border border-transparent dark:border-slate-800`}
               >
                 <motion.div 
                   whileHover={{ scale: 1.1 }}
-                  className={`w-12 h-12 ${f.iconBg} rounded-xl flex items-center justify-center mb-5 transition-colors`}
+                  className={`w-12 h-12 ${f.iconBg} dark:bg-opacity-20 rounded-xl flex items-center justify-center mb-5 transition-colors`}
                 >
                   <f.icon className={`w-6 h-6 ${f.iconColor}`} />
                 </motion.div>
-                <h3 className="text-slate-900 font-bold text-xl mb-3">{f.title}</h3>
-                <p className="text-slate-600 text-sm leading-relaxed">{f.desc}</p>
+                <h3 className="text-slate-900 dark:text-white font-bold text-xl mb-3 transition-colors">{f.title}</h3>
+                <p className="text-slate-600 dark:text-slate-300 text-sm leading-relaxed transition-colors">{f.desc}</p>
               </motion.div>
             ))}
           </div>
@@ -314,11 +317,11 @@ export default function LandingPage() {
       </section>
 
       {/* ===== HOW IT WORKS ===== */}
-      <section id="cara-kerja" className="py-24 px-6 bg-white">
+      <section id="cara-kerja" className="py-24 px-6 bg-background transition-colors duration-300">
         <div className="max-w-5xl mx-auto">
           <motion.div initial={{ opacity: 0, y: 20 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} className="text-center mb-16">
-            <p className="text-blue-600 text-sm font-bold uppercase tracking-widest mb-3">Cara Kerja</p>
-            <h2 className="text-3xl md:text-4xl font-extrabold text-slate-900">Semudah scan QR, seaman brankas.</h2>
+            <p className="text-blue-600 dark:text-blue-400 text-sm font-bold uppercase tracking-widest mb-3">Cara Kerja</p>
+            <h2 className="text-3xl md:text-4xl font-extrabold text-slate-900 dark:text-white transition-colors">Semudah scan QR, seaman brankas.</h2>
           </motion.div>
 
           <div className="space-y-4">
@@ -351,19 +354,19 @@ export default function LandingPage() {
                 whileInView={{ opacity: 1, x: 0 }}
                 viewport={{ once: true }}
                 transition={{ delay: i * 0.12 }}
-                whileHover={{ x: 8, backgroundColor: "rgba(248, 250, 252, 0.5)", borderColor: "#bfdbfe" }}
-                className="flex flex-col sm:flex-row gap-6 bg-white border border-slate-200 rounded-2xl p-7 hover:shadow-md transition-all duration-300 cursor-default"
+                whileHover={{ x: 8 }}
+                className="flex flex-col sm:flex-row gap-6 bg-white dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded-2xl p-7 hover:shadow-md dark:hover:shadow-blue-900/10 hover:border-blue-200 dark:hover:border-blue-900 transition-all duration-300 cursor-default"
               >
                 <motion.div 
                   whileHover={{ scale: 1.1, color: "#3b82f6" }}
-                  className="text-5xl font-black text-slate-100 shrink-0 select-none sm:w-16 transition-colors"
+                  className="text-5xl font-black text-slate-100 dark:text-slate-800 shrink-0 select-none sm:w-16 transition-colors"
                 >
                   {step.step}
                 </motion.div>
                 <div className="flex-1">
-                  <span className={`text-xs font-bold uppercase tracking-wider px-2.5 py-1 rounded-md ${step.actorColor}`}>{step.actor}</span>
-                  <h3 className="text-slate-900 font-bold text-xl mt-3 mb-2">{step.title}</h3>
-                  <p className="text-slate-600 text-sm leading-relaxed">{step.desc}</p>
+                  <span className={`text-xs font-bold uppercase tracking-wider px-2.5 py-1 rounded-md ${step.actorColor} dark:bg-opacity-20`}>{step.actor}</span>
+                  <h3 className="text-slate-900 dark:text-white font-bold text-xl mt-3 mb-2 transition-colors">{step.title}</h3>
+                  <p className="text-slate-600 dark:text-slate-300 text-sm leading-relaxed transition-colors">{step.desc}</p>
                 </div>
               </motion.div>
             ))}

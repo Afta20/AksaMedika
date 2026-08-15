@@ -12,6 +12,7 @@ import { patientApi } from "@/lib/api";
 import type { MaskedRecord, AuditEntry, User as UserType } from "@/types/api";
 import Link from "next/link";
 import { formatDistanceToNow, differenceInMinutes } from "date-fns";
+import { ThemeToggle } from "@/components/ThemeToggle";
 import { QRCodeSVG } from "qrcode.react";
 
 export default function PatientDashboard() {
@@ -148,35 +149,36 @@ export default function PatientDashboard() {
   };
 
   return (
-    <div className="min-h-screen bg-slate-50" style={{ fontFamily: "'Inter', system-ui, sans-serif" }}>
+    <div className="min-h-screen bg-slate-50 dark:bg-slate-950 transition-colors duration-300" style={{ fontFamily: "'Inter', system-ui, sans-serif" }}>
       {/* Top Nav */}
-      <nav className="bg-white border-b border-slate-200 sticky top-0 z-40 shadow-sm">
+      <nav className="bg-white dark:bg-slate-900 border-b border-slate-200 dark:border-slate-800 sticky top-0 z-40 shadow-sm transition-colors duration-300">
         <div className="max-w-7xl mx-auto px-4 lg:px-8 h-16 flex items-center justify-between">
           <div className="flex items-center gap-2.5">
             <div className="w-8 h-8 bg-blue-600 rounded-xl flex items-center justify-center shadow-sm p-1.5">
               <img src="/aksamedika.svg" alt="Logo" className="w-full h-full object-contain invert brightness-0" />
             </div>
-            <span className="font-bold text-slate-900 tracking-tight text-lg">Aksa<span className="text-blue-600">medika</span></span>
+            <span className="font-bold text-slate-900 dark:text-white tracking-tight text-lg transition-colors">Aksa<span className="text-blue-600 dark:text-blue-400">medika</span></span>
           </div>
           <div className="flex items-center gap-3">
             {user && (
               <div className="hidden sm:flex flex-col items-end mr-2">
-                <span className="text-xs font-bold text-slate-900">{user.name}</span>
-                <span className="text-[10px] text-slate-500 font-medium">Pasien</span>
+                <span className="text-xs font-bold text-slate-900 dark:text-white transition-colors">{user.name}</span>
+                <span className="text-[10px] text-slate-500 dark:text-slate-400 font-medium transition-colors">Pasien</span>
               </div>
             )}
             {user && (
-              <div className="w-9 h-9 bg-blue-100 rounded-full flex items-center justify-center shadow-inner border border-blue-200 mr-2">
-                <span className="text-blue-700 text-xs font-bold">{getInitials(user.name)}</span>
+              <div className="w-9 h-9 bg-blue-100 dark:bg-blue-900/50 rounded-full flex items-center justify-center shadow-inner border border-blue-200 dark:border-blue-800 mr-2 transition-colors">
+                <span className="text-blue-700 dark:text-blue-300 text-xs font-bold">{getInitials(user.name)}</span>
               </div>
             )}
-            <div className="flex items-center gap-1 border-l border-slate-200 pl-4">
+            <div className="flex items-center gap-1 border-l border-slate-200 dark:border-slate-800 pl-4 transition-colors">
+              <ThemeToggle />
               <Link href="/patient/settings"
-                className="text-slate-400 hover:text-blue-600 transition-colors p-2 rounded-xl hover:bg-blue-50">
+                className="text-slate-400 hover:text-blue-600 dark:hover:text-blue-400 transition-colors p-2 rounded-xl hover:bg-blue-50 dark:hover:bg-slate-800">
                 <Settings className="w-4 h-4" />
               </Link>
               <button onClick={handleLogout}
-                className="text-slate-400 hover:text-rose-600 transition-colors p-2 rounded-xl hover:bg-rose-50">
+                className="text-slate-400 hover:text-rose-600 dark:hover:text-rose-400 transition-colors p-2 rounded-xl hover:bg-rose-50 dark:hover:bg-slate-800">
                 <LogOut className="w-4 h-4" />
               </button>
             </div>
@@ -193,12 +195,12 @@ export default function PatientDashboard() {
             
             {/* Greeting Banner */}
             <motion.div initial={{ opacity: 0, y: 16 }} animate={{ opacity: 1, y: 0 }}>
-              <div className="bg-white border border-slate-200 rounded-2xl p-6 shadow-sm">
-                <p className="text-slate-500 text-sm font-medium">{getGreeting()},</p>
-                <h1 className="text-2xl font-extrabold text-slate-900 mt-1">
-                  {user?.name ?? <Skeleton className="h-8 w-48" />}
+              <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl p-6 shadow-sm transition-colors duration-300">
+                <p className="text-slate-500 dark:text-slate-400 text-sm font-medium transition-colors">{getGreeting()},</p>
+                <h1 className="text-2xl font-extrabold text-slate-900 dark:text-white mt-1 transition-colors">
+                  {user?.name ?? <Skeleton className="h-8 w-48 dark:bg-slate-800" />}
                 </h1>
-                <p className="text-blue-600 text-xs font-bold mt-2 flex items-center gap-1.5">
+                <p className="text-blue-600 dark:text-blue-400 text-xs font-bold mt-2 flex items-center gap-1.5 transition-colors">
                   <ShieldCheck className="w-3.5 h-3.5" /> Akun Terverifikasi
                 </p>
               </div>

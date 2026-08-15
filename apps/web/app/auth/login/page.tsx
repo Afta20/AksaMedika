@@ -10,6 +10,7 @@ import { Label } from "@/components/ui/label";
 import { toast } from "sonner";
 import { authApi } from "@/lib/api";
 import Link from "next/link";
+import { ThemeToggle } from "@/components/ThemeToggle";
 
 function LoginForm() {
   const router = useRouter();
@@ -44,7 +45,7 @@ function LoginForm() {
   };
 
   return (
-    <div className="min-h-screen flex" style={{ fontFamily: "'Inter', system-ui, sans-serif" }}>
+    <div className="min-h-screen flex bg-background text-foreground transition-colors duration-300" style={{ fontFamily: "'Inter', system-ui, sans-serif" }}>
       {/* ===== LEFT: Brand Panel ===== */}
       <div className="hidden lg:flex flex-col justify-between w-[45%] bg-blue-600 p-12 relative overflow-hidden">
         {/* Background decoration */}
@@ -86,29 +87,32 @@ function LoginForm() {
       </div>
 
       {/* ===== RIGHT: Form Panel ===== */}
-      <div className="flex-1 flex flex-col justify-center px-6 py-12 lg:px-16 bg-white">
+      <div className="flex-1 flex flex-col justify-center px-6 py-12 lg:px-16 bg-white dark:bg-slate-950 transition-colors duration-300 relative">
+        <div className="absolute top-6 right-6">
+          <ThemeToggle />
+        </div>
         <div className="max-w-sm mx-auto w-full">
           <Link href="/" className="lg:hidden flex items-center gap-3 mb-8">
             <div className="w-10 h-10 bg-blue-600 rounded-xl flex items-center justify-center p-1 shadow-md shadow-blue-600/20">
               <img src="/aksamedika.svg" alt="Logo" className="w-full h-full object-contain invert brightness-0" />
             </div>
-            <span className="text-slate-900 font-bold text-xl">Aksa<span className="text-blue-600">medika</span></span>
+            <span className="text-slate-900 dark:text-white font-bold text-xl transition-colors">Aksa<span className="text-blue-600 dark:text-blue-400">medika</span></span>
           </Link>
 
           <motion.div initial={{ opacity: 0, y: 16 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.4 }}>
             <div className="mb-8">
-              <h1 className="text-2xl font-extrabold text-slate-900">Selamat datang kembali</h1>
-              <p className="text-slate-500 text-sm mt-1">Masuk ke akun Anda untuk melanjutkan</p>
+              <h1 className="text-2xl font-extrabold text-slate-900 dark:text-white transition-colors">Selamat datang kembali</h1>
+              <p className="text-slate-500 dark:text-slate-400 text-sm mt-1 transition-colors">Masuk ke portal Aksamedika untuk melanjutkan</p>
             </div>
 
             {/* Role Selector */}
-            <div className="flex rounded-xl border border-slate-200 p-1 mb-7 bg-slate-50">
+            <div className="flex rounded-xl border border-slate-200 dark:border-slate-800 p-1 mb-6 bg-slate-50 dark:bg-slate-900 transition-colors">
               {(["patient", "doctor"] as const).map((r) => (
                 <button key={r} onClick={() => setRole(r)}
                   className={`flex-1 flex items-center justify-center gap-2 py-2.5 rounded-lg text-sm font-semibold transition-all duration-200 ${
                     role === r
-                      ? "bg-white text-blue-600 shadow-sm border border-slate-200"
-                      : "text-slate-500 hover:text-slate-800"
+                      ? "bg-white dark:bg-slate-800 text-blue-600 dark:text-blue-400 shadow-sm border border-slate-200 dark:border-slate-700"
+                      : "text-slate-500 dark:text-slate-400 hover:text-slate-700 dark:hover:text-slate-300"
                   }`}>
                   {r === "patient" ? <User className="w-4 h-4" /> : <Stethoscope className="w-4 h-4" />}
                   {r === "patient" ? "Pasien" : "Dokter"}
@@ -118,24 +122,25 @@ function LoginForm() {
 
             {/* Form */}
             <form onSubmit={handleLogin} className="space-y-5">
-              <div className="space-y-1.5">
-                <Label htmlFor="email" className="text-slate-700 text-sm font-semibold">Email</Label>
-                <Input id="email" type="email" placeholder="nama@email.com"
-                  value={email} onChange={(e) => setEmail(e.target.value)} required
-                  className="h-11 rounded-xl border-slate-200 bg-slate-50 text-slate-900 placeholder:text-slate-400 focus:border-blue-500 focus:bg-white transition-colors" />
-              </div>
-              <div className="space-y-1.5">
-                <Label htmlFor="password" className="text-slate-700 text-sm font-semibold">Password</Label>
-                <div className="relative">
-                  <Input id="password" type={showPass ? "text" : "password"} placeholder="••••••••"
-                    value={password} onChange={(e) => setPassword(e.target.value)} required
-                    className="h-11 rounded-xl border-slate-200 bg-slate-50 text-slate-900 placeholder:text-slate-400 focus:border-blue-500 focus:bg-white pr-11 transition-colors" />
-                  <button type="button" onClick={() => setShowPass(!showPass)}
-                    className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600 transition-colors">
-                    {showPass ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
-                  </button>
+                <div className="space-y-1.5">
+                  <Label className="text-slate-700 dark:text-slate-300 font-bold transition-colors">Email</Label>
+                  <Input type="email" placeholder="nama@email.com" required value={email} onChange={(e) => setEmail(e.target.value)}
+                    className="h-12 bg-slate-50 dark:bg-slate-900 border-slate-200 dark:border-slate-800 focus-visible:ring-blue-600 dark:text-white transition-colors" />
                 </div>
-              </div>
+                
+                <div className="space-y-1.5">
+                  <div className="flex items-center justify-between">
+                    <Label className="text-slate-700 dark:text-slate-300 font-bold transition-colors">Password</Label>
+                    <a href="#" className="text-xs font-bold text-blue-600 dark:text-blue-400 hover:underline">Lupa password?</a>
+                  </div>
+                  <div className="relative">
+                    <Input type={showPass ? "text" : "password"} placeholder="••••••••" required value={password} onChange={(e) => setPassword(e.target.value)}
+                      className="h-12 bg-slate-50 dark:bg-slate-900 border-slate-200 dark:border-slate-800 focus-visible:ring-blue-600 pr-10 dark:text-white transition-colors" />
+                    <button type="button" onClick={() => setShowPass(!showPass)} className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 dark:text-slate-500 hover:text-slate-600 dark:hover:text-slate-300">
+                      {showPass ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
+                    </button>
+                  </div>
+                </div>
 
               <Button type="submit" disabled={loading}
                 className="w-full h-11 bg-blue-600 hover:bg-blue-700 text-white font-bold rounded-xl shadow-md shadow-blue-500/20 text-sm mt-2 transition-all">
@@ -150,19 +155,19 @@ function LoginForm() {
             {/* Demo credentials */}
             <AnimatePresence>
               <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }}
-                className="mt-6 p-4 bg-blue-50 border border-blue-100 rounded-xl">
-                <p className="text-blue-700 text-xs font-bold mb-2">🧪 Demo Credentials</p>
-                <div className="space-y-1 text-xs text-slate-600">
-                  <p><span className="font-semibold text-slate-800">Pasien:</span> budi.santoso@demo.com / password123</p>
-                  <p><span className="font-semibold text-slate-800">Dokter:</span> dr.andi@demo.com / password123</p>
+                className="mt-6 p-4 bg-blue-50 dark:bg-blue-950/20 border border-blue-100 dark:border-blue-900/50 rounded-xl">
+                <p className="text-blue-700 dark:text-blue-400 text-xs font-bold mb-2">🧪 Demo Credentials</p>
+                <div className="space-y-1 text-xs text-slate-600 dark:text-slate-400">
+                  <p><span className="font-semibold text-slate-800 dark:text-slate-200">Pasien:</span> budi.santoso@demo.com / password123</p>
+                  <p><span className="font-semibold text-slate-800 dark:text-slate-200">Dokter:</span> dr.andi@demo.com / password123</p>
                 </div>
               </motion.div>
             </AnimatePresence>
 
-            <p className="text-center text-slate-500 text-sm mt-6">
+            <p className="text-center text-sm text-slate-500 dark:text-slate-400 font-medium mt-6 transition-colors">
               Belum punya akun?{" "}
-              <Link href={`/auth/register?role=${role}`} className="text-blue-600 hover:text-blue-700 font-bold">
-                Daftar di sini
+              <Link href={`/auth/register?role=${role}`} className="text-blue-600 dark:text-blue-400 font-bold hover:underline">
+                Daftar sekarang
               </Link>
             </p>
 

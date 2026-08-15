@@ -16,6 +16,8 @@ import { Label } from "@/components/ui/label";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Skeleton } from "@/components/ui/skeleton";
+import { format } from "date-fns";
+import { ThemeToggle } from "@/components/ThemeToggle";
 import { toast } from "sonner";
 import { doctorApi } from "@/lib/api";
 import QRScanner from "@/components/QRScanner";
@@ -386,59 +388,62 @@ function DashboardContent() {
     name ? name.split(" ").map(n => n[0]).slice(0, 2).join("").toUpperCase() : "?";
 
   return (
-    <div className="min-h-screen bg-slate-50 flex" style={{ fontFamily: "'Inter', system-ui, sans-serif" }}>
+    <div className="min-h-screen bg-slate-50 dark:bg-slate-950 flex transition-colors duration-300" style={{ fontFamily: "'Inter', system-ui, sans-serif" }}>
 
       {/* ===== SIDEBAR ===== */}
-      <aside className="w-80 bg-white border-r border-slate-200 flex-col fixed top-0 left-0 bottom-0 z-40 hidden lg:flex shadow-sm overflow-y-auto">
-        <div className="p-6 border-b border-slate-100">
-          <div className="flex items-center gap-2.5">
-            <div className="w-8 h-8 bg-blue-600 rounded-xl flex items-center justify-center shadow-sm">
-              <Shield className="w-4 h-4 text-white" />
+      <aside className="w-80 bg-white dark:bg-slate-900 border-r border-slate-200 dark:border-slate-800 flex-col fixed top-0 left-0 bottom-0 z-40 hidden lg:flex shadow-sm overflow-y-auto transition-colors duration-300">
+        <div className="p-6 border-b border-slate-100 dark:border-slate-800 transition-colors">
+          <div className="flex items-center justify-between mb-6">
+            <div className="flex items-center gap-2.5">
+              <div className="w-8 h-8 bg-blue-600 rounded-xl flex items-center justify-center shadow-sm">
+                <Shield className="w-4 h-4 text-white" />
+              </div>
+              <span className="text-slate-900 dark:text-white font-bold text-lg tracking-tight transition-colors">
+                Aksa<span className="text-blue-600 dark:text-blue-400">medika</span>
+              </span>
             </div>
-            <span className="text-slate-900 font-bold text-lg tracking-tight">
-              Aksa<span className="text-blue-600">medika</span>
-            </span>
+            <ThemeToggle />
           </div>
 
-          <div className="mt-6 flex flex-col items-center bg-blue-50/50 rounded-2xl p-4 border border-blue-100 text-center">
+          <div className="flex flex-col items-center bg-blue-50/50 dark:bg-blue-900/20 rounded-2xl p-4 border border-blue-100 dark:border-blue-900/50 text-center transition-colors">
             <div className="w-16 h-16 bg-blue-600 rounded-full flex items-center justify-center shadow-md mb-3">
               <span className="text-white text-xl font-extrabold">
                 {profile ? getInitials(profile.name) : "?"}
               </span>
             </div>
-            <p className="text-slate-900 font-bold">{profile?.name ?? "Memuat..."}</p>
+            <p className="text-slate-900 dark:text-white font-bold transition-colors">{profile?.name ?? "Memuat..."}</p>
             {profile?.specialty && (
-              <Badge className="mt-2 bg-blue-100 text-blue-700 border-blue-200 shadow-none hover:bg-blue-100">
+              <Badge className="mt-2 bg-blue-100 dark:bg-blue-900/50 text-blue-700 dark:text-blue-300 border-blue-200 dark:border-blue-800 shadow-none hover:bg-blue-100 dark:hover:bg-blue-900/50 transition-colors">
                 {profile.specialty}
               </Badge>
             )}
             {profile?.license_no && (
-              <p className="text-slate-500 text-xs mt-2 font-mono">{profile.license_no}</p>
+              <p className="text-slate-500 dark:text-slate-400 text-xs mt-2 font-mono transition-colors">{profile.license_no}</p>
             )}
           </div>
         </div>
 
         <div className="flex-1 p-5">
-          <h3 className="text-xs font-bold text-slate-500 uppercase tracking-wider mb-4">Riwayat Akses Terakhir</h3>
+          <h3 className="text-xs font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider mb-4 transition-colors">Riwayat Akses Terakhir</h3>
           {history.length === 0 ? (
-            <div className="text-center py-6 text-slate-400 text-sm">Belum ada riwayat akses.</div>
+            <div className="text-center py-6 text-slate-400 dark:text-slate-500 text-sm transition-colors">Belum ada riwayat akses.</div>
           ) : (
             <div className="space-y-3">
               {history.map((entry) => (
-                <div key={entry.id} className="flex items-center gap-3 p-3 bg-slate-50 rounded-xl border border-slate-100">
+                <div key={entry.id} className="flex items-center gap-3 p-3 bg-slate-50 dark:bg-slate-900/50 rounded-xl border border-slate-100 dark:border-slate-800 transition-colors">
                   <div className={`w-8 h-8 rounded-full flex items-center justify-center shrink-0 ${
-                    entry.access_method === 'EMERGENCY' ? 'bg-rose-100' : 'bg-white border border-slate-200'
-                  }`}>
+                    entry.access_method === 'EMERGENCY' ? 'bg-rose-100 dark:bg-rose-900/30' : 'bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700'
+                  } transition-colors`}>
                     {entry.access_method === 'EMERGENCY' 
-                      ? <TriangleAlert className="w-4 h-4 text-rose-600" />
-                      : <UserIcon className="w-4 h-4 text-slate-400" />
+                      ? <TriangleAlert className="w-4 h-4 text-rose-600 dark:text-rose-400" />
+                      : <UserIcon className="w-4 h-4 text-slate-400 dark:text-slate-500" />
                     }
                   </div>
                   <div className="min-w-0 flex-1">
-                    <p className={`text-sm font-bold truncate ${entry.access_method === 'EMERGENCY' ? 'text-rose-600' : 'text-slate-900'}`}>
+                    <p className={`text-sm font-bold truncate ${entry.access_method === 'EMERGENCY' ? 'text-rose-600 dark:text-rose-400' : 'text-slate-900 dark:text-white'} transition-colors`}>
                       {entry.patient_name}
                     </p>
-                    <p className="text-slate-500 text-xs">
+                    <p className="text-slate-500 dark:text-slate-400 text-xs transition-colors">
                       {new Date(entry.accessed_at).toLocaleDateString('id-ID', {day: 'numeric', month: 'short', hour: '2-digit', minute: '2-digit'})}
                     </p>
                   </div>
@@ -455,25 +460,25 @@ function DashboardContent() {
 
         <div className="p-4 border-t border-slate-100 bg-slate-50">
           <button onClick={handleLogout}
-            className="flex items-center gap-2 text-slate-500 hover:text-rose-600 hover:bg-rose-50 text-sm font-bold transition-colors w-full px-4 py-2.5 rounded-xl">
+            className="flex items-center gap-2 text-slate-500 dark:text-slate-400 hover:text-rose-600 dark:hover:text-rose-400 hover:bg-rose-50 dark:hover:bg-rose-900/20 text-sm font-bold transition-colors w-full px-4 py-2.5 rounded-xl">
             <LogOut className="w-4 h-4" /> Keluar
           </button>
         </div>
       </aside>
 
       {/* ===== MAIN ===== */}
-      <main className="flex-1 lg:ml-80 p-6 lg:p-10 pt-20 lg:pt-10">
+      <main className="flex-1 lg:ml-80 p-6 lg:p-10 pt-20 lg:pt-10 transition-colors duration-300">
         
         {!patient && (
           <div className="mb-10 grid grid-cols-1 md:grid-cols-3 gap-4">
-            <Card className="bg-white shadow-sm border-slate-200">
+            <Card className="bg-white dark:bg-slate-900 shadow-sm border-slate-200 dark:border-slate-800 transition-colors">
               <CardContent className="p-5 flex items-center gap-4">
-                <div className="w-12 h-12 bg-blue-50 rounded-xl flex items-center justify-center">
-                  <Users className="w-6 h-6 text-blue-600" />
+                <div className="w-12 h-12 bg-blue-50 dark:bg-blue-900/20 rounded-xl flex items-center justify-center transition-colors">
+                  <Users className="w-6 h-6 text-blue-600 dark:text-blue-400" />
                 </div>
                 <div>
-                  <p className="text-3xl font-extrabold text-slate-900">{stats?.total_accesses ?? 0}</p>
-                  <p className="text-slate-500 text-sm font-medium">Total Pasien Diakses</p>
+                  <p className="text-3xl font-extrabold text-slate-900 dark:text-white transition-colors">{stats?.total_accesses ?? 0}</p>
+                  <p className="text-slate-500 dark:text-slate-400 text-sm font-medium transition-colors">Total Pasien Diakses</p>
                 </div>
               </CardContent>
             </Card>

@@ -10,6 +10,7 @@ import { Label } from "@/components/ui/label";
 import { toast } from "sonner";
 import { authApi } from "@/lib/api";
 import Link from "next/link";
+import { ThemeToggle } from "@/components/ThemeToggle";
 
 function RegisterForm() {
   const router = useRouter();
@@ -38,7 +39,7 @@ function RegisterForm() {
   };
 
   return (
-    <div className="min-h-screen flex" style={{ fontFamily: "'Inter', system-ui, sans-serif" }}>
+    <div className="min-h-screen flex bg-background text-foreground transition-colors duration-300" style={{ fontFamily: "'Inter', system-ui, sans-serif" }}>
       {/* ===== LEFT: Brand Panel ===== */}
       <div className="hidden lg:flex flex-col justify-between w-[45%] bg-blue-600 p-12 relative overflow-hidden">
         <div className="absolute top-0 right-0 w-96 h-96 bg-blue-500/30 rounded-full -translate-y-1/2 translate-x-1/2" />
@@ -76,31 +77,34 @@ function RegisterForm() {
       </div>
 
       {/* ===== RIGHT: Form Panel ===== */}
-      <div className="flex-1 flex flex-col justify-center px-6 py-12 lg:px-16 bg-white overflow-y-auto">
+      <div className="flex-1 flex flex-col justify-center px-6 py-12 lg:px-16 bg-white dark:bg-slate-950 transition-colors duration-300 overflow-y-auto relative">
+        <div className="absolute top-6 right-6">
+          <ThemeToggle />
+        </div>
         <div className="max-w-sm mx-auto w-full">
           <Link href="/" className="lg:hidden flex items-center gap-3 mb-8">
             <div className="w-10 h-10 bg-blue-600 rounded-xl flex items-center justify-center p-1 shadow-md shadow-blue-600/20">
               <img src="/aksamedika.svg" alt="Logo" className="w-full h-full object-contain invert brightness-0" />
             </div>
-            <span className="text-slate-900 font-bold text-xl">Aksa<span className="text-blue-600">medika</span></span>
+            <span className="text-slate-900 dark:text-white font-bold text-xl transition-colors">Aksa<span className="text-blue-600 dark:text-blue-400">medika</span></span>
           </Link>
 
           <motion.div initial={{ opacity: 0, y: 16 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.4 }}>
             <div className="mb-8">
-              <h1 className="text-2xl font-extrabold text-slate-900">Buat akun baru</h1>
-              <p className="text-slate-500 text-sm mt-1">Bergabung dengan Aksamedika hari ini</p>
+              <h1 className="text-2xl font-extrabold text-slate-900 dark:text-white transition-colors">Buat akun baru</h1>
+              <p className="text-slate-500 dark:text-slate-400 text-sm mt-1 transition-colors">Bergabung dengan Aksamedika hari ini</p>
             </div>
 
             {/* Role Selector */}
-            <div className="flex rounded-xl border border-slate-200 p-1 mb-6 bg-slate-50">
+            <div className="flex rounded-xl border border-slate-200 dark:border-slate-800 p-1 mb-6 bg-slate-50 dark:bg-slate-900 transition-colors">
               {(["patient", "doctor"] as const).map((r) => (
                 <button key={r} onClick={() => setRole(r)}
                   className={`flex-1 flex items-center justify-center gap-2 py-2.5 rounded-lg text-sm font-semibold transition-all duration-200 ${
                     role === r
-                      ? "bg-white text-blue-600 shadow-sm border border-slate-200"
-                      : "text-slate-500 hover:text-slate-800"
-                  }`}>
-                  {r === "patient" ? <User className="w-4 h-4" /> : <Stethoscope className="w-4 h-4" />}
+                      ? "bg-white dark:bg-slate-800 text-blue-600 dark:text-blue-400 shadow-sm border border-slate-200 dark:border-slate-700"
+                      : "text-slate-500 dark:text-slate-400 hover:text-slate-700 dark:hover:text-slate-300"
+                  }`}
+                >  {r === "patient" ? <User className="w-4 h-4" /> : <Stethoscope className="w-4 h-4" />}
                   {r === "patient" ? "Pasien" : "Dokter"}
                 </button>
               ))}
@@ -108,48 +112,41 @@ function RegisterForm() {
 
             <form onSubmit={handleSubmit} className="space-y-4">
               <div className="space-y-1.5">
-                <Label className="text-slate-700 text-sm font-semibold">Nama Lengkap</Label>
-                <Input placeholder="Nama lengkap Anda" value={form.name}
-                  onChange={e => setForm({...form, name: e.target.value})} required
-                  className="h-11 rounded-xl border-slate-200 bg-slate-50 text-slate-900 placeholder:text-slate-400 focus:border-blue-500 focus:bg-white transition-colors" />
+                <Label className="text-slate-700 dark:text-slate-300 font-bold transition-colors">Nama Lengkap</Label>
+                <Input placeholder="dr. Budi / Budi Santoso" required value={form.name} onChange={(e) => setForm({...form, name: e.target.value})}
+                  className="h-12 bg-slate-50 dark:bg-slate-900 border-slate-200 dark:border-slate-800 focus-visible:ring-blue-600 dark:text-white transition-colors" />
               </div>
+
               <div className="space-y-1.5">
-                <Label className="text-slate-700 text-sm font-semibold">Email</Label>
-                <Input type="email" placeholder="nama@email.com" value={form.email}
-                  onChange={e => setForm({...form, email: e.target.value})} required
-                  className="h-11 rounded-xl border-slate-200 bg-slate-50 text-slate-900 placeholder:text-slate-400 focus:border-blue-500 focus:bg-white transition-colors" />
+                <Label className="text-slate-700 dark:text-slate-300 font-bold transition-colors">Email</Label>
+                <Input type="email" placeholder="nama@email.com" required value={form.email} onChange={(e) => setForm({...form, email: e.target.value})}
+                  className="h-12 bg-slate-50 dark:bg-slate-900 border-slate-200 dark:border-slate-800 focus-visible:ring-blue-600 dark:text-white transition-colors" />
               </div>
+              
               <div className="space-y-1.5">
-                <Label className="text-slate-700 text-sm font-semibold">Password</Label>
+                <Label className="text-slate-700 dark:text-slate-300 font-bold transition-colors">Password</Label>
                 <div className="relative">
-                  <Input type={showPass ? "text" : "password"} placeholder="Min. 8 karakter"
-                    value={form.password} onChange={e => setForm({...form, password: e.target.value})}
-                    required minLength={8}
-                    className="h-11 rounded-xl border-slate-200 bg-slate-50 text-slate-900 placeholder:text-slate-400 focus:border-blue-500 focus:bg-white pr-11 transition-colors" />
-                  <button type="button" onClick={() => setShowPass(!showPass)}
-                    className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600 transition-colors">
+                  <Input type={showPass ? "text" : "password"} placeholder="Minimal 8 karakter" required value={form.password} onChange={(e) => setForm({...form, password: e.target.value})}
+                    className="h-12 bg-slate-50 dark:bg-slate-900 border-slate-200 dark:border-slate-800 focus-visible:ring-blue-600 pr-10 dark:text-white transition-colors" />
+                  <button type="button" onClick={() => setShowPass(!showPass)} className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 dark:text-slate-500 hover:text-slate-600 dark:hover:text-slate-300">
                     {showPass ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
                   </button>
                 </div>
               </div>
 
               {role === "doctor" && (
-                <motion.div initial={{ opacity: 0, height: 0 }} animate={{ opacity: 1, height: "auto" }}
-                  className="space-y-4 pt-1 border-t border-slate-100">
-                  <p className="text-xs font-bold text-slate-500 uppercase tracking-wider">Info Profesional Dokter</p>
+                <>
                   <div className="space-y-1.5">
-                    <Label className="text-slate-700 text-sm font-semibold">Spesialisasi</Label>
-                    <Input placeholder="cth. Dokter Umum, Spesialis Jantung" value={form.specialty}
-                      onChange={e => setForm({...form, specialty: e.target.value})}
-                      className="h-11 rounded-xl border-slate-200 bg-slate-50 text-slate-900 placeholder:text-slate-400 focus:border-blue-500 focus:bg-white transition-colors" />
+                    <Label className="text-slate-700 dark:text-slate-300 font-bold transition-colors">Spesialisasi</Label>
+                    <Input placeholder="cth: Dokter Umum, Jantung" required value={form.specialty} onChange={(e) => setForm({...form, specialty: e.target.value})}
+                      className="h-12 bg-slate-50 dark:bg-slate-900 border-slate-200 dark:border-slate-800 focus-visible:ring-blue-600 dark:text-white transition-colors" />
                   </div>
                   <div className="space-y-1.5">
-                    <Label className="text-slate-700 text-sm font-semibold">Nomor STR/Lisensi</Label>
-                    <Input placeholder="STR-GP-XXXXXX" value={form.license_no}
-                      onChange={e => setForm({...form, license_no: e.target.value})}
-                      className="h-11 rounded-xl border-slate-200 bg-slate-50 text-slate-900 placeholder:text-slate-400 focus:border-blue-500 focus:bg-white transition-colors" />
+                    <Label className="text-slate-700 dark:text-slate-300 font-bold transition-colors">No. SIP (Surat Izin Praktik)</Label>
+                    <Input placeholder="cth: SIP.123.456.789" required value={form.license_no} onChange={(e) => setForm({...form, license_no: e.target.value})}
+                      className="h-12 bg-slate-50 dark:bg-slate-900 border-slate-200 dark:border-slate-800 focus-visible:ring-blue-600 dark:text-white transition-colors" />
                   </div>
-                </motion.div>
+                </>
               )}
 
               <Button type="submit" disabled={loading}
@@ -158,9 +155,11 @@ function RegisterForm() {
               </Button>
             </form>
 
-            <p className="text-center text-slate-500 text-sm mt-6">
+            <p className="text-center text-sm text-slate-500 dark:text-slate-400 font-medium mt-6 transition-colors">
               Sudah punya akun?{" "}
-              <Link href={`/auth/login?role=${role}`} className="text-blue-600 hover:text-blue-700 font-bold">Masuk di sini</Link>
+              <Link href={`/auth/login?role=${role}`} className="text-blue-600 dark:text-blue-400 font-bold hover:underline">
+                Masuk di sini
+              </Link>
             </p>
 
             <Link href="/" className="block text-center text-slate-400 hover:text-slate-600 text-xs mt-4 transition-colors">
