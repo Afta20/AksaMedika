@@ -22,6 +22,7 @@ export default function PatientDashboard() {
   const [auditLogs, setAuditLogs] = useState<AuditEntry[]>([]);
   const [loading, setLoading] = useState(true);
   const [sessionRevoked, setSessionRevoked] = useState(false);
+  const [revoking, setRevoking] = useState(false);
   const [showQRZoom, setShowQRZoom] = useState(false);
 
   const loadData = useCallback(async (token: string) => {
@@ -135,16 +136,25 @@ export default function PatientDashboard() {
   const activeSession = !sessionRevoked && recentLog && recentLog.access_method !== 'REVOKED' && differenceInMinutes(new Date(), new Date(recentLog.accessed_at)) < 30;
 
   const handleKillSwitch = async () => {
+    if (revoking) return; // Prevent double-click
+    setRevoking(true);
     try {
       const token = localStorage.getItem("cg_token");
-      if (token) {
-        await patientApi.revokeAccess(token);
-        setSessionRevoked(true);
-        toast.success("Akses berhasil dicabut! Semua sesi telah dihentikan paksa.");
-        loadData(token); // Reload data to get the new REVOKED audit log
+      if (!token) {
+        toast.error("Sesi tidak ditemukan. Silakan login ulang.");
+        router.push("/auth/login?role=patient");
+        return;
       }
-    } catch (err) {
-      toast.error("Gagal mencabut akses. Coba lagi.");
+      await patientApi.revokeAccess(token);
+      setSessionRevoked(true);
+      toast.success("Akses berhasil dicabut! Semua sesi telah dihentikan paksa.");
+      await loadData(token); // Reload data to get the new REVOKED audit log
+    } catch (err: unknown) {
+      const message = err instanceof Error ? err.message : "Terjadi kesalahan";
+      toast.error(`Gagal mencabut akses: ${message}. Coba lagi.`);
+      setSessionRevoked(false); // Reset so button stays visible
+    } finally {
+      setRevoking(false);
     }
   };
 
@@ -276,10 +286,25 @@ export default function PatientDashboard() {
                 </div>
 
                 {activeSession ? (
-                  <button onClick={handleKillSwitch}
-                    className="w-full py-3 bg-rose-600 hover:bg-rose-700 text-white text-sm font-bold rounded-xl shadow-md shadow-rose-600/20 transition-all flex items-center justify-center gap-2 group">
-                    Cabut Izin Akses Sekarang
-                    <LogOut className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
+                  <button
+                    onClick={handleKillSwitch}
+                    disabled={revoking}
+                    className="w-full py-3 bg-rose-600 hover:bg-rose-700 disabled:opacity-70 disabled:cursor-not-allowed text-white text-sm font-bold rounded-xl shadow-md shadow-rose-600/20 transition-all flex items-center justify-center gap-2 group"
+                  >
+                    {revoking ? (
+                      <>
+                        <svg className="animate-spin w-4 h-4" viewBox="0 0 24 24" fill="none">
+                          <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"/>
+                          <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v4l3-3-3-3v4a8 8 0 00-8 8h4z"/>
+                        </svg>
+                        Mencabut Akses...
+                      </>
+                    ) : (
+                      <>
+                        Cabut Izin Akses Sekarang
+                        <LogOut className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
+                      </>
+                    )}
                   </button>
                 ) : (
                   <div className="w-full py-3 bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 text-slate-400 dark:text-slate-500 text-sm font-semibold rounded-xl text-center transition-colors">
