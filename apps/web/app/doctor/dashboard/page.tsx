@@ -270,13 +270,33 @@ function DashboardContent() {
     setLoadingRecords(true);
     try {
       const recRes = await doctorApi.getPatientRecords(patientId, token);
-      setRecords(recRes.records as MedicalRecord[]);
+      const fetchedRecords = recRes.records as MedicalRecord[];
+      setRecords(fetchedRecords);
       
-      // Auto-fetch AI Summary after fetching records
+      // Call Gemini API directly from the browser (bypasses backend timeout)
       setLoadingAi(true);
       try {
-        const aiRes = await doctorApi.getPatientSummaryAI(patientId, token);
-        setAiSummary(aiRes.summary);
+        const geminiKey = process.env.NEXT_PUBLIC_GEMINI_API_KEY;
+        if (!geminiKey) throw new Error("GEMINI_API_KEY tidak dikonfigurasi");
+
+        const contextText = fetchedRecords.map(r =>
+          `Tanggal: ${r.visit_date}, Diagnosis: ${r.diagnosis}, Resep: ${r.prescription || "-"}, Catatan: ${r.notes || "-"}`
+        ).join("\n");
+
+        const prompt = `Kamu adalah asisten medis profesional. Baca rekam medis pasien berikut dan berikan ringkasan singkat 3 poin penting dalam Bahasa Indonesia. Fokus pada kondisi kronis, masalah terkini, dan potensi interaksi obat. Singkat dan profesional.\n\nRekam Medis:\n${contextText}`;
+
+        const res = await fetch(
+          `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash-lite:generateContent?key=${geminiKey}`,
+          {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ contents: [{ parts: [{ text: prompt }] }] }),
+          }
+        );
+        const data = await res.json();
+        const summary = data?.candidates?.[0]?.content?.parts?.[0]?.text;
+        if (!summary) throw new Error("Respons AI kosong");
+        setAiSummary(summary);
       } catch (err) {
         const errMsg = err instanceof Error ? err.message : String(err);
         setAiSummary(`Gagal memuat ringkasan AI: ${errMsg}`);
