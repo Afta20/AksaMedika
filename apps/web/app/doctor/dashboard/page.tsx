@@ -482,27 +482,27 @@ function DashboardContent() {
                 </div>
               </CardContent>
             </Card>
-            <Card className="bg-white shadow-sm border-slate-200">
+            <Card className="bg-white dark:bg-slate-900 shadow-sm border-slate-200 dark:border-slate-800 transition-colors">
               <CardContent className="p-5 flex items-center gap-4">
-                <div className="w-12 h-12 bg-emerald-50 rounded-xl flex items-center justify-center">
-                  <Activity className="w-6 h-6 text-emerald-600" />
+                <div className="w-12 h-12 bg-emerald-50 dark:bg-emerald-900/20 rounded-xl flex items-center justify-center transition-colors">
+                  <Activity className="w-6 h-6 text-emerald-600 dark:text-emerald-400" />
                 </div>
                 <div>
-                  <p className="text-3xl font-extrabold text-slate-900">{stats?.today_accesses ?? 0}</p>
-                  <p className="text-slate-500 text-sm font-medium">Akses Hari Ini</p>
+                  <p className="text-3xl font-extrabold text-slate-900 dark:text-white transition-colors">{stats?.today_accesses ?? 0}</p>
+                  <p className="text-slate-500 dark:text-slate-400 text-sm font-medium transition-colors">Akses Hari Ini</p>
                 </div>
               </CardContent>
             </Card>
-            <Card className="bg-white shadow-sm border-slate-200 md:col-span-1">
+            <Card className="bg-white dark:bg-slate-900 shadow-sm border-slate-200 dark:border-slate-800 md:col-span-1 transition-colors">
               <CardContent className="p-5 flex items-center gap-4">
-                <div className="w-12 h-12 bg-violet-50 rounded-xl flex items-center justify-center">
-                  <Clock className="w-6 h-6 text-violet-600" />
+                <div className="w-12 h-12 bg-violet-50 dark:bg-violet-900/20 rounded-xl flex items-center justify-center transition-colors">
+                  <Clock className="w-6 h-6 text-violet-600 dark:text-violet-400" />
                 </div>
                 <div>
-                  <p className="text-lg font-bold text-slate-900">
+                  <p className="text-lg font-bold text-slate-900 dark:text-white transition-colors">
                     {stats?.last_accessed_at ? new Date(stats.last_accessed_at).toLocaleTimeString('id-ID', {hour: '2-digit', minute: '2-digit'}) : "-"}
                   </p>
-                  <p className="text-slate-500 text-sm font-medium">Akses Terakhir</p>
+                  <p className="text-slate-500 dark:text-slate-400 text-sm font-medium transition-colors">Akses Terakhir</p>
                 </div>
               </CardContent>
             </Card>
@@ -511,10 +511,10 @@ function DashboardContent() {
 
         <div className="flex items-start justify-between mb-8">
           <div>
-            <h1 className="text-2xl md:text-3xl font-extrabold text-slate-900">
+            <h1 className="text-2xl md:text-3xl font-extrabold text-slate-900 dark:text-white transition-colors">
               {patient ? "Rekam Medis Pasien" : "Portal Akses Pasien"}
             </h1>
-            <p className="text-slate-500 text-sm mt-1.5">
+            <p className="text-slate-500 dark:text-slate-400 text-sm mt-1.5 transition-colors">
               {patient 
                 ? "Akses eksklusif sementara diaktifkan."
                 : "Masukkan PIN 6-digit dari pasien atau Scan QR Code."}
@@ -532,24 +532,24 @@ function DashboardContent() {
           {/* === ACCESS PORTAL === */}
           {!patient && !showQR && !showEmergency && (
             <motion.div key="pin-entry" initial={{ opacity: 0, y: 16 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -16 }} className="max-w-md">
-              <Card className={`border shadow-sm transition-all ${
-                state === "error" ? "border-rose-300 shadow-rose-100" : "border-slate-200"
+              <Card className={`border shadow-sm transition-all bg-white dark:bg-slate-900 ${
+                state === "error" ? "border-rose-300 dark:border-rose-800 shadow-rose-100 dark:shadow-none" : "border-slate-200 dark:border-slate-800"
               }`}>
                 <CardContent className="pt-8 pb-8 px-8">
                   <div className="text-center mb-8">
                     <div className={`w-16 h-16 rounded-2xl flex items-center justify-center mx-auto mb-4 transition-all ${
-                      state === "loading" ? "bg-blue-50"
-                      : state === "error" ? "bg-rose-50"
-                      : "bg-slate-100"
+                      state === "loading" ? "bg-blue-50 dark:bg-blue-900/20"
+                      : state === "error" ? "bg-rose-50 dark:bg-rose-900/20"
+                      : "bg-slate-100 dark:bg-slate-800"
                     }`}>
                       {state === "loading"
-                        ? <Loader2 className="w-8 h-8 text-blue-600 animate-spin" />
+                        ? <Loader2 className="w-8 h-8 text-blue-600 dark:text-blue-400 animate-spin" />
                         : state === "error"
-                        ? <AlertCircle className="w-8 h-8 text-rose-500" />
-                        : <Lock className="w-8 h-8 text-slate-400" />
+                        ? <AlertCircle className="w-8 h-8 text-rose-500 dark:text-rose-400" />
+                        : <Lock className="w-8 h-8 text-slate-400 dark:text-slate-500" />
                       }
                     </div>
-                    <h2 className="text-xl font-extrabold text-slate-900">Masukkan PIN Pasien</h2>
+                    <h2 className="text-xl font-extrabold text-slate-900 dark:text-white transition-colors">Masukkan PIN Pasien</h2>
                   </div>
 
                   <div className={`flex gap-2 sm:gap-3 justify-center mb-6 ${shaking ? "shake" : ""}`}>
@@ -562,10 +562,10 @@ function DashboardContent() {
                         disabled={state === "loading"}
                         className={`w-11 h-14 sm:w-12 sm:h-14 text-center text-2xl font-extrabold rounded-xl border-2 outline-none transition-all
                           ${state === "error"
-                            ? "border-rose-400 text-rose-500 bg-rose-50"
+                            ? "border-rose-400 dark:border-rose-800 text-rose-500 dark:text-rose-400 bg-rose-50 dark:bg-rose-950/30"
                             : digit
-                            ? "border-blue-500 text-blue-700 bg-blue-50"
-                            : "border-slate-200 text-slate-900 bg-white focus:border-blue-400 focus:bg-blue-50/30"
+                            ? "border-blue-500 dark:border-blue-700 text-blue-700 dark:text-blue-400 bg-blue-50 dark:bg-blue-900/30"
+                            : "border-slate-200 dark:border-slate-800 text-slate-900 dark:text-white bg-white dark:bg-slate-950 focus:border-blue-400 dark:focus:border-blue-700 focus:bg-blue-50/30 dark:focus:bg-blue-900/10"
                           }`}
                       />
                     ))}
@@ -666,9 +666,9 @@ function DashboardContent() {
               className="space-y-6 max-w-4xl">
 
               {/* Patient header */}
-              <Card className="border-blue-100 bg-gradient-to-r from-blue-50 to-white shadow-sm overflow-hidden">
+              <Card className="border-blue-100 dark:border-blue-900/50 bg-gradient-to-r from-blue-50 dark:from-blue-950 to-white dark:to-slate-900 shadow-sm overflow-hidden transition-colors">
                 <CardContent className="py-6 px-6 relative">
-                  <div className="absolute right-0 top-0 bottom-0 w-32 bg-gradient-to-l from-blue-100/50 to-transparent pointer-events-none" />
+                  <div className="absolute right-0 top-0 bottom-0 w-32 bg-gradient-to-l from-blue-100/50 dark:from-blue-900/20 to-transparent pointer-events-none" />
                   <div className="flex items-center justify-between relative z-10">
                     <div className="flex items-center gap-5">
                       <div className="w-16 h-16 bg-blue-600 rounded-2xl flex items-center justify-center shadow-md shadow-blue-500/20">
@@ -678,15 +678,15 @@ function DashboardContent() {
                       </div>
                       <div>
                         <div className="flex items-center gap-3 flex-wrap">
-                          <p className="text-slate-900 font-extrabold text-2xl">{patient.patient_name}</p>
-                          <Badge className="bg-emerald-100 text-emerald-700 border-emerald-200 text-xs font-bold shadow-none px-2 py-0.5">
+                          <p className="text-slate-900 dark:text-white font-extrabold text-2xl transition-colors">{patient.patient_name}</p>
+                          <Badge className="bg-emerald-100 dark:bg-emerald-900/30 text-emerald-700 dark:text-emerald-400 border-emerald-200 dark:border-emerald-800 text-xs font-bold shadow-none px-2 py-0.5 transition-colors">
                             <CheckCircle2 className="w-3 h-3 mr-1" /> Sesi Aktif
                           </Badge>
                         </div>
-                        <p className="text-slate-600 text-sm mt-1 flex items-center gap-1.5">
-                          <Shield className="w-4 h-4 text-emerald-500" />
+                        <p className="text-slate-600 dark:text-slate-400 text-sm mt-1 flex items-center gap-1.5 transition-colors">
+                          <Shield className="w-4 h-4 text-emerald-500 dark:text-emerald-400" />
                           {patient.message === "EMERGENCY ACCESS GRANTED" 
-                            ? <span className="text-rose-600 font-bold">AKSES DARURAT DIGUNAKAN</span>
+                            ? <span className="text-rose-600 dark:text-rose-400 font-bold">AKSES DARURAT DIGUNAKAN</span>
                             : "Sesi aman sedang berlangsung. Anda memiliki izin baca dan tulis."}
                         </p>
                       </div>
@@ -696,11 +696,11 @@ function DashboardContent() {
               </Card>
 
               {/* AI MEDICAL SUMMARY (Tier 1 Wow Feature) */}
-              <Card className="border-purple-200 bg-gradient-to-br from-purple-50 to-white shadow-sm overflow-hidden relative">
-                <div className="absolute top-0 right-0 w-32 h-32 bg-purple-200/50 rounded-full blur-3xl -translate-y-1/2 translate-x-1/2"></div>
-                <CardHeader className="pb-3 border-b border-purple-100/50">
-                  <CardTitle className="text-purple-900 flex items-center gap-2 text-lg">
-                    <Sparkles className="w-5 h-5 text-purple-600" />
+              <Card className="border-purple-200 dark:border-purple-900/50 bg-gradient-to-br from-purple-50 dark:from-purple-950/30 to-white dark:to-slate-900 shadow-sm overflow-hidden relative transition-colors">
+                <div className="absolute top-0 right-0 w-32 h-32 bg-purple-200/50 dark:bg-purple-900/20 rounded-full blur-3xl -translate-y-1/2 translate-x-1/2"></div>
+                <CardHeader className="pb-3 border-b border-purple-100/50 dark:border-purple-900/30">
+                  <CardTitle className="text-purple-900 dark:text-purple-300 flex items-center gap-2 text-lg transition-colors">
+                    <Sparkles className="w-5 h-5 text-purple-600 dark:text-purple-400" />
                     AI Medical Insights
                   </CardTitle>
                 </CardHeader>
@@ -731,11 +731,11 @@ function DashboardContent() {
               </Card>
 
               <div className="flex flex-col sm:flex-row items-center justify-between gap-4 pt-2">
-                <h2 className="text-lg font-bold text-slate-900 flex items-center gap-2">
-                  <FileText className="w-5 h-5 text-blue-600" />
+                <h2 className="text-lg font-bold text-slate-900 dark:text-white flex items-center gap-2 transition-colors">
+                  <FileText className="w-5 h-5 text-blue-600 dark:text-blue-400" />
                   Riwayat Rekam Medis
                   {!loadingRecords && (
-                    <Badge variant="secondary" className="text-xs bg-slate-200 text-slate-700 shadow-none">
+                    <Badge variant="secondary" className="text-xs bg-slate-200 dark:bg-slate-800 text-slate-700 dark:text-slate-300 shadow-none transition-colors">
                       {records.length} rekam
                     </Badge>
                   )}
@@ -749,36 +749,36 @@ function DashboardContent() {
               <AnimatePresence>
                 {showAddForm && (
                   <motion.div initial={{ opacity: 0, height: 0 }} animate={{ opacity: 1, height: "auto" }} exit={{ opacity: 0, height: 0 }} className="overflow-hidden">
-                    <Card className="border-2 border-blue-200 shadow-md bg-blue-50/30">
-                      <CardHeader className="border-b border-blue-100 bg-white">
-                        <CardTitle className="text-base text-slate-900">Tambah Rekam Medis Baru</CardTitle>
+                    <Card className="border-2 border-blue-200 dark:border-blue-900/50 shadow-md bg-blue-50/30 dark:bg-slate-900 transition-colors">
+                      <CardHeader className="border-b border-blue-100 dark:border-slate-800 bg-white dark:bg-slate-900 transition-colors">
+                        <CardTitle className="text-base text-slate-900 dark:text-white transition-colors">Tambah Rekam Medis Baru</CardTitle>
                       </CardHeader>
-                      <CardContent className="p-6 bg-white">
+                      <CardContent className="p-6 bg-white dark:bg-slate-900 transition-colors">
                         <form onSubmit={handleAddRecord} className="space-y-4">
                           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                             <div className="space-y-1.5">
-                              <Label className="font-semibold text-slate-700">Diagnosis Utama *</Label>
-                              <Input required value={newRecord.diagnosis} onChange={e => setNewRecord({...newRecord, diagnosis: e.target.value})} placeholder="cth. Hipertensi" className="bg-slate-50 border-slate-200" />
+                              <Label className="font-semibold text-slate-700 dark:text-slate-300 transition-colors">Diagnosis Utama *</Label>
+                              <Input required value={newRecord.diagnosis} onChange={e => setNewRecord({...newRecord, diagnosis: e.target.value})} placeholder="cth. Hipertensi" className="bg-slate-50 dark:bg-slate-950 border-slate-200 dark:border-slate-800 transition-colors" />
                             </div>
                             <div className="space-y-1.5">
-                              <Label className="font-semibold text-slate-700">Kode ICD-10 (Opsional)</Label>
-                              <Input value={newRecord.icd_code} onChange={e => setNewRecord({...newRecord, icd_code: e.target.value})} placeholder="cth. I10" className="bg-slate-50 border-slate-200 font-mono" />
+                              <Label className="font-semibold text-slate-700 dark:text-slate-300 transition-colors">Kode ICD-10 (Opsional)</Label>
+                              <Input value={newRecord.icd_code} onChange={e => setNewRecord({...newRecord, icd_code: e.target.value})} placeholder="cth. I10" className="bg-slate-50 dark:bg-slate-950 border-slate-200 dark:border-slate-800 font-mono transition-colors" />
                             </div>
                           </div>
                           
                           <div className="space-y-1.5">
-                            <Label className="font-semibold text-slate-700">Resep Obat</Label>
-                            <Input value={newRecord.prescription} onChange={e => setNewRecord({...newRecord, prescription: e.target.value})} placeholder="cth. Amlodipine 5mg 1x1" className="bg-slate-50 border-slate-200" />
+                            <Label className="font-semibold text-slate-700 dark:text-slate-300 transition-colors">Resep Obat</Label>
+                            <Input value={newRecord.prescription} onChange={e => setNewRecord({...newRecord, prescription: e.target.value})} placeholder="cth. Amlodipine 5mg 1x1" className="bg-slate-50 dark:bg-slate-950 border-slate-200 dark:border-slate-800 transition-colors" />
                           </div>
 
                           <div className="space-y-1.5">
-                            <Label className="font-semibold text-slate-700">Catatan Dokter</Label>
-                            <Textarea value={newRecord.notes} onChange={e => setNewRecord({...newRecord, notes: e.target.value})} placeholder="Tambahkan catatan keluhan atau observasi klinis..." className="bg-slate-50 border-slate-200 min-h-[100px]" />
+                            <Label className="font-semibold text-slate-700 dark:text-slate-300 transition-colors">Catatan Dokter</Label>
+                            <Textarea value={newRecord.notes} onChange={e => setNewRecord({...newRecord, notes: e.target.value})} placeholder="Tambahkan catatan keluhan atau observasi klinis..." className="bg-slate-50 dark:bg-slate-950 border-slate-200 dark:border-slate-800 min-h-[100px] transition-colors" />
                           </div>
 
                           <div className="space-y-1.5">
-                            <Label className="font-semibold text-slate-700">Tanggal Kunjungan *</Label>
-                            <Input type="date" required value={newRecord.visit_date} onChange={e => setNewRecord({...newRecord, visit_date: e.target.value})} className="bg-slate-50 border-slate-200 max-w-[200px]" />
+                            <Label className="font-semibold text-slate-700 dark:text-slate-300 transition-colors">Tanggal Kunjungan *</Label>
+                            <Input type="date" required value={newRecord.visit_date} onChange={e => setNewRecord({...newRecord, visit_date: e.target.value})} className="bg-slate-50 dark:bg-slate-950 border-slate-200 dark:border-slate-800 max-w-[200px] transition-colors" />
                           </div>
 
                           <div className="pt-2 flex justify-end">
@@ -799,20 +799,20 @@ function DashboardContent() {
                   // ✨ Skeleton loaders — mimic the shape of actual record cards
                   <div className="space-y-3">
                     {Array.from({ length: 3 }).map((_, i) => (
-                      <Card key={i} className="bg-white border-slate-200 shadow-sm">
+                      <Card key={i} className="bg-white dark:bg-slate-900 border-slate-200 dark:border-slate-800 shadow-sm transition-colors">
                         <CardContent className="p-5 md:p-6">
                           <div className="flex flex-col md:flex-row items-start justify-between gap-4">
                             <div className="flex-1 space-y-3 w-full">
                               <div className="flex items-center gap-3">
-                                <Skeleton className="h-6 w-2/5 rounded-md" />
-                                <Skeleton className="h-5 w-14 rounded-full" />
+                                <Skeleton className="h-6 w-2/5 rounded-md dark:bg-slate-800" />
+                                <Skeleton className="h-5 w-14 rounded-full dark:bg-slate-800" />
                               </div>
-                              <Skeleton className="h-4 w-3/5 rounded-md" />
-                              <Skeleton className="h-4 w-4/5 rounded-md" />
+                              <Skeleton className="h-4 w-3/5 rounded-md dark:bg-slate-800" />
+                              <Skeleton className="h-4 w-4/5 rounded-md dark:bg-slate-800" />
                             </div>
                             <div className="text-right shrink-0 w-full md:w-auto space-y-2">
-                              <Skeleton className="h-4 w-28 rounded-md ml-auto" />
-                              <Skeleton className="h-3 w-20 rounded-md ml-auto" />
+                              <Skeleton className="h-4 w-28 rounded-md ml-auto dark:bg-slate-800" />
+                              <Skeleton className="h-3 w-20 rounded-md ml-auto dark:bg-slate-800" />
                             </div>
                           </div>
                         </CardContent>
@@ -820,24 +820,24 @@ function DashboardContent() {
                     ))}
                   </div>
                 ) : records.length === 0 ? (
-                  <div className="text-center py-16 bg-white border border-slate-200 rounded-2xl shadow-sm">
-                    <div className="w-12 h-12 bg-slate-50 rounded-2xl flex items-center justify-center mx-auto mb-3">
-                      <FileText className="w-6 h-6 text-slate-400" />
+                  <div className="text-center py-16 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl shadow-sm transition-colors">
+                    <div className="w-12 h-12 bg-slate-50 dark:bg-slate-800/50 rounded-2xl flex items-center justify-center mx-auto mb-3 transition-colors">
+                      <FileText className="w-6 h-6 text-slate-400 dark:text-slate-500" />
                     </div>
-                    <p className="text-slate-900 font-bold">Belum ada rekam medis</p>
-                    <p className="text-slate-500 text-sm mt-1 max-w-sm mx-auto">Silakan tambahkan rekam medis baru untuk pasien ini menggunakan tombol di atas.</p>
+                    <p className="text-slate-900 dark:text-white font-bold transition-colors">Belum ada rekam medis</p>
+                    <p className="text-slate-500 dark:text-slate-400 text-sm mt-1 max-w-sm mx-auto transition-colors">Silakan tambahkan rekam medis baru untuk pasien ini menggunakan tombol di atas.</p>
                   </div>
                 ) : (
                   records.map((r, i) => (
                     <motion.div key={r.id} initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: i * 0.05 }}>
-                      <Card className="bg-white border-slate-200 shadow-sm hover:border-blue-200 hover:shadow-md transition-all">
+                      <Card className="bg-white dark:bg-slate-900 border-slate-200 dark:border-slate-800 shadow-sm hover:border-blue-200 dark:hover:border-blue-800 hover:shadow-md transition-all">
                         <CardContent className="p-5 md:p-6">
                           <div className="flex flex-col md:flex-row items-start justify-between gap-4">
                             <div className="flex-1">
                               <div className="flex items-center gap-3 mb-2">
-                                <h3 className="text-slate-900 font-extrabold text-lg">{r.diagnosis}</h3>
+                                <h3 className="text-slate-900 dark:text-white font-extrabold text-lg transition-colors">{r.diagnosis}</h3>
                                 {r.icd_code && (
-                                  <Badge variant="outline" className="text-xs font-mono text-slate-600 bg-slate-50 shadow-none border-slate-200">
+                                  <Badge variant="outline" className="text-xs font-mono text-slate-600 dark:text-slate-400 bg-slate-50 dark:bg-slate-800 shadow-none border-slate-200 dark:border-slate-700 transition-colors">
                                     {r.icd_code}
                                   </Badge>
                                 )}
@@ -846,30 +846,30 @@ function DashboardContent() {
                               <div className="space-y-2 mt-3">
                                 {r.prescription && (
                                   <div className="flex items-start gap-2.5">
-                                    <div className="w-6 h-6 bg-emerald-50 rounded-md flex items-center justify-center shrink-0 mt-0.5">
-                                      <Pill className="w-3.5 h-3.5 text-emerald-600" />
+                                    <div className="w-6 h-6 bg-emerald-50 dark:bg-emerald-900/30 rounded-md flex items-center justify-center shrink-0 mt-0.5 transition-colors">
+                                      <Pill className="w-3.5 h-3.5 text-emerald-600 dark:text-emerald-400" />
                                     </div>
-                                    <p className="text-slate-700 text-sm font-medium leading-relaxed">{r.prescription}</p>
+                                    <p className="text-slate-700 dark:text-slate-300 text-sm font-medium leading-relaxed transition-colors">{r.prescription}</p>
                                   </div>
                                 )}
                                 {r.notes && (
                                   <div className="flex items-start gap-2.5">
-                                    <div className="w-6 h-6 bg-blue-50 rounded-md flex items-center justify-center shrink-0 mt-0.5">
-                                      <ClipboardList className="w-3.5 h-3.5 text-blue-600" />
+                                    <div className="w-6 h-6 bg-blue-50 dark:bg-blue-900/30 rounded-md flex items-center justify-center shrink-0 mt-0.5 transition-colors">
+                                      <ClipboardList className="w-3.5 h-3.5 text-blue-600 dark:text-blue-400" />
                                     </div>
-                                    <p className="text-slate-600 text-sm leading-relaxed">{r.notes}</p>
+                                    <p className="text-slate-600 dark:text-slate-400 text-sm leading-relaxed transition-colors">{r.notes}</p>
                                   </div>
                                 )}
                               </div>
                             </div>
                             
-                            <div className="text-left md:text-right shrink-0 w-full md:w-auto pt-4 md:pt-0 border-t md:border-0 border-slate-100 mt-2 md:mt-0 space-y-2">
-                              <div className="flex items-center md:justify-end gap-1.5 text-slate-900 font-bold text-sm">
-                                <Calendar className="w-4 h-4 text-slate-400" />
+                            <div className="text-left md:text-right shrink-0 w-full md:w-auto pt-4 md:pt-0 border-t md:border-0 border-slate-100 dark:border-slate-800 mt-2 md:mt-0 space-y-2 transition-colors">
+                              <div className="flex items-center md:justify-end gap-1.5 text-slate-900 dark:text-white font-bold text-sm transition-colors">
+                                <Calendar className="w-4 h-4 text-slate-400 dark:text-slate-500" />
                                 {new Date(r.visit_date).toLocaleDateString("id-ID", { day: "numeric", month: "long", year: "numeric" })}
                               </div>
                               {r.doctor_name && (
-                                <p className="text-slate-500 text-xs font-medium flex items-center md:justify-end gap-1.5">
+                                <p className="text-slate-500 dark:text-slate-400 text-xs font-medium flex items-center md:justify-end gap-1.5 transition-colors">
                                   <Stethoscope className="w-3 h-3" /> dr. {r.doctor_name}
                                 </p>
                               )}
@@ -885,7 +885,7 @@ function DashboardContent() {
                                     }
                                   );
                                 }}
-                                className="inline-flex items-center gap-1.5 text-xs font-semibold text-slate-400 hover:text-blue-600 transition-colors px-2 py-1 rounded-lg hover:bg-blue-50 md:ml-auto"
+                                className="inline-flex items-center gap-1.5 text-xs font-semibold text-slate-400 dark:text-slate-500 hover:text-blue-600 dark:hover:text-blue-400 transition-colors px-2 py-1 rounded-lg hover:bg-blue-50 dark:hover:bg-blue-900/20 md:ml-auto"
                               >
                                 <Download className="w-3.5 h-3.5" />
                                 Export PDF
@@ -908,7 +908,7 @@ function DashboardContent() {
 
 export default function DoctorDashboard() {
   return (
-    <Suspense fallback={<div className="min-h-screen bg-slate-50 flex items-center justify-center font-bold text-slate-500">Memuat Dashboard...</div>}>
+    <Suspense fallback={<div className="min-h-screen bg-slate-50 dark:bg-slate-950 flex items-center justify-center font-bold text-slate-500 dark:text-slate-400 transition-colors duration-300">Memuat Dashboard...</div>}>
       <DashboardContent />
     </Suspense>
   );

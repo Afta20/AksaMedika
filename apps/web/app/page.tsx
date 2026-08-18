@@ -67,22 +67,51 @@ export default function LandingPage() {
           </div>
 
           {/* Mobile menu button */}
-          <button className="md:hidden p-2 rounded-lg hover:bg-slate-100" onClick={() => setMobileMenuOpen(!mobileMenuOpen)}>
-            {mobileMenuOpen ? <X className="w-5 h-5" /> : <Menu className="w-5 h-5" />}
-          </button>
+          <div className="md:hidden flex items-center gap-2">
+            <ThemeToggle />
+            <button
+              className="p-2 rounded-lg text-slate-700 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors duration-200"
+              onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
+              aria-label="Toggle menu"
+            >
+              {mobileMenuOpen ? <X className="w-5 h-5" /> : <Menu className="w-5 h-5" />}
+            </button>
+          </div>
         </div>
 
         {/* Mobile Menu */}
         {mobileMenuOpen && (
           <motion.div initial={{ opacity: 0, y: -8 }} animate={{ opacity: 1, y: 0 }}
-            className="md:hidden border-t border-slate-100 dark:border-slate-800 bg-white dark:bg-slate-950 px-6 py-4 space-y-3">
-            <div className="flex justify-end mb-2"><ThemeToggle /></div>
-            <Link href="/auth/login?role=patient" className="block w-full">
-              <Button className="w-full bg-blue-600 hover:bg-blue-700 text-white font-bold rounded-lg">Masuk sebagai Pasien</Button>
-            </Link>
-            <Link href="/auth/login?role=doctor" className="block w-full">
-              <Button variant="outline" className="w-full font-semibold">Portal Dokter</Button>
-            </Link>
+            className="md:hidden border-t border-slate-100 dark:border-slate-800 bg-white dark:bg-slate-950 px-6 py-4 space-y-2">
+            <a
+              href="#tentang"
+              onClick={() => setMobileMenuOpen(false)}
+              className="block px-3 py-2.5 rounded-lg text-slate-700 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-900 hover:text-blue-600 dark:hover:text-blue-400 font-medium text-sm transition-colors"
+            >
+              Tentang
+            </a>
+            <a
+              href="#cara-kerja"
+              onClick={() => setMobileMenuOpen(false)}
+              className="block px-3 py-2.5 rounded-lg text-slate-700 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-900 hover:text-blue-600 dark:hover:text-blue-400 font-medium text-sm transition-colors"
+            >
+              Cara Kerja
+            </a>
+            <a
+              href="#fitur"
+              onClick={() => setMobileMenuOpen(false)}
+              className="block px-3 py-2.5 rounded-lg text-slate-700 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-900 hover:text-blue-600 dark:hover:text-blue-400 font-medium text-sm transition-colors"
+            >
+              Fitur
+            </a>
+            <div className="pt-2 border-t border-slate-100 dark:border-slate-800 space-y-2">
+              <Link href="/auth/login?role=patient" className="block w-full" onClick={() => setMobileMenuOpen(false)}>
+                <Button className="w-full bg-blue-600 hover:bg-blue-700 text-white font-bold rounded-lg">Masuk sebagai Pasien</Button>
+              </Link>
+              <Link href="/auth/login?role=doctor" className="block w-full" onClick={() => setMobileMenuOpen(false)}>
+                <Button variant="outline" className="w-full font-semibold dark:border-slate-700 dark:text-slate-300 dark:hover:bg-slate-800">Portal Dokter</Button>
+              </Link>
+            </div>
           </motion.div>
         )}
       </nav>

@@ -248,10 +248,10 @@ export default function PatientDashboard() {
 
             {/* Active Session Radar / Kill Switch */}
             <motion.div initial={{ opacity: 0, y: 16 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.2 }}>
-              <div className={`rounded-2xl p-6 border transition-all ${
+              <div className={`rounded-2xl p-6 border transition-all duration-300 ${
                 activeSession 
-                  ? "bg-rose-50 border-rose-200 shadow-lg shadow-rose-500/10" 
-                  : "bg-white border-slate-200 shadow-sm"
+                  ? "bg-rose-50 dark:bg-rose-950/30 border-rose-200 dark:border-rose-900/50 shadow-lg shadow-rose-500/10" 
+                  : "bg-white dark:bg-slate-900 border-slate-200 dark:border-slate-800 shadow-sm"
               }`}>
                 <div className="flex items-center gap-3 mb-4">
                   <div className={`relative flex items-center justify-center w-10 h-10 rounded-full ${
@@ -266,10 +266,10 @@ export default function PatientDashboard() {
                     <PowerOff className="w-5 h-5 relative z-10" />
                   </div>
                   <div>
-                    <h3 className={`font-bold text-sm ${activeSession ? "text-rose-900" : "text-slate-900"}`}>
+                    <h3 className={`font-bold text-sm transition-colors ${activeSession ? "text-rose-900 dark:text-rose-400" : "text-slate-900 dark:text-white"}`}>
                       Status Sesi Akses
                     </h3>
-                    <p className={`text-xs mt-0.5 ${activeSession ? "text-rose-600 font-semibold" : "text-slate-500"}`}>
+                    <p className={`text-xs mt-0.5 transition-colors ${activeSession ? "text-rose-600 dark:text-rose-500 font-semibold" : "text-slate-500 dark:text-slate-400"}`}>
                       {activeSession ? "1 Dokter sedang melihat data Anda" : "Tidak ada akses aktif"}
                     </p>
                   </div>
@@ -282,7 +282,7 @@ export default function PatientDashboard() {
                     <LogOut className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
                   </button>
                 ) : (
-                  <div className="w-full py-3 bg-slate-50 border border-slate-200 text-slate-400 text-sm font-semibold rounded-xl text-center">
+                  <div className="w-full py-3 bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 text-slate-400 dark:text-slate-500 text-sm font-semibold rounded-xl text-center transition-colors">
                     Data Anda aman (Zero-Trust)
                   </div>
                 )}
@@ -315,28 +315,28 @@ export default function PatientDashboard() {
             {/* Stats */}
             <motion.div initial={{ opacity: 0, y: 16 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.15 }}
               className="grid grid-cols-2 gap-4">
-              <Card className="bg-white border border-slate-200 shadow-sm rounded-2xl overflow-hidden group hover:border-blue-200 transition-colors">
+              <Card className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 shadow-sm rounded-2xl overflow-hidden group hover:border-blue-200 dark:hover:border-blue-800 transition-colors duration-300">
                 <CardContent className="p-6">
                   <div className="flex justify-between items-start mb-4">
-                    <div className="w-10 h-10 bg-blue-50 group-hover:bg-blue-100 rounded-xl flex items-center justify-center transition-colors">
-                      <FileText className="w-5 h-5 text-blue-600" />
+                    <div className="w-10 h-10 bg-blue-50 dark:bg-blue-900/30 group-hover:bg-blue-100 dark:group-hover:bg-blue-900/50 rounded-xl flex items-center justify-center transition-colors">
+                      <FileText className="w-5 h-5 text-blue-600 dark:text-blue-400" />
                     </div>
-                    <Badge className="bg-blue-50 text-blue-700 border-blue-100 text-xs shadow-none">Total</Badge>
+                    <Badge className="bg-blue-50 dark:bg-blue-900/30 text-blue-700 dark:text-blue-400 border-blue-100 dark:border-blue-800 text-xs shadow-none transition-colors">Total</Badge>
                   </div>
-                  <p className="text-4xl font-black text-slate-900 tracking-tight">{loading ? "–" : records.length}</p>
-                  <p className="text-slate-500 text-sm mt-1 font-medium">Dokumen Rekam Medis</p>
+                  <p className="text-4xl font-black text-slate-900 dark:text-white tracking-tight transition-colors">{loading ? "–" : records.length}</p>
+                  <p className="text-slate-500 dark:text-slate-400 text-sm mt-1 font-medium transition-colors">Dokumen Rekam Medis</p>
                 </CardContent>
               </Card>
-              <Card className="bg-white border border-slate-200 shadow-sm rounded-2xl overflow-hidden group hover:border-emerald-200 transition-colors">
+              <Card className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 shadow-sm rounded-2xl overflow-hidden group hover:border-emerald-200 dark:hover:border-emerald-800 transition-colors duration-300">
                 <CardContent className="p-6">
                   <div className="flex justify-between items-start mb-4">
-                    <div className="w-10 h-10 bg-emerald-50 group-hover:bg-emerald-100 rounded-xl flex items-center justify-center transition-colors">
-                      <Activity className="w-5 h-5 text-emerald-600" />
+                    <div className="w-10 h-10 bg-emerald-50 dark:bg-emerald-900/30 group-hover:bg-emerald-100 dark:group-hover:bg-emerald-900/50 rounded-xl flex items-center justify-center transition-colors">
+                      <Activity className="w-5 h-5 text-emerald-600 dark:text-emerald-400" />
                     </div>
-                    <Badge className="bg-emerald-50 text-emerald-700 border-emerald-100 text-xs shadow-none">Bulan Ini</Badge>
+                    <Badge className="bg-emerald-50 dark:bg-emerald-900/30 text-emerald-700 dark:text-emerald-400 border-emerald-100 dark:border-emerald-800 text-xs shadow-none transition-colors">Bulan Ini</Badge>
                   </div>
-                  <p className="text-4xl font-black text-slate-900 tracking-tight">{loading ? "–" : auditLogs.length}</p>
-                  <p className="text-slate-500 text-sm mt-1 font-medium">Log Akses Keamanan</p>
+                  <p className="text-4xl font-black text-slate-900 dark:text-white tracking-tight transition-colors">{loading ? "–" : auditLogs.length}</p>
+                  <p className="text-slate-500 dark:text-slate-400 text-sm mt-1 font-medium transition-colors">Log Akses Keamanan</p>
                 </CardContent>
               </Card>
             </motion.div>
@@ -344,39 +344,39 @@ export default function PatientDashboard() {
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
               {/* Visual Health Timeline */}
               <motion.div initial={{ opacity: 0, y: 16 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.25 }}
-                className="bg-white border border-slate-200 rounded-2xl shadow-sm p-6 flex flex-col h-full">
+                className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl shadow-sm p-6 flex flex-col h-full transition-colors duration-300">
                 <div className="flex items-center gap-3 mb-6">
-                  <div className="w-8 h-8 bg-blue-50 rounded-lg flex items-center justify-center">
-                    <Activity className="w-4 h-4 text-blue-600" />
+                  <div className="w-8 h-8 bg-blue-50 dark:bg-blue-900/30 rounded-lg flex items-center justify-center transition-colors">
+                    <Activity className="w-4 h-4 text-blue-600 dark:text-blue-400" />
                   </div>
-                  <h2 className="text-slate-900 font-bold text-base">Linimasa Kesehatan</h2>
+                  <h2 className="text-slate-900 dark:text-white font-bold text-base transition-colors">Linimasa Kesehatan</h2>
                 </div>
                 
                 <div className="flex-1">
                   {loading ? (
                     <div className="space-y-4">
-                      {Array.from({length: 3}).map((_, i) => <Skeleton key={i} className="h-16 w-full rounded-xl" />)}
+                      {Array.from({length: 3}).map((_, i) => <Skeleton key={i} className="h-16 w-full rounded-xl dark:bg-slate-800" />)}
                     </div>
                   ) : records.length === 0 ? (
                     <div className="h-full flex flex-col items-center justify-center text-center py-8">
-                      <div className="w-16 h-16 bg-slate-50 rounded-full flex items-center justify-center mb-3 border border-dashed border-slate-200">
-                        <FileText className="w-6 h-6 text-slate-300" />
+                      <div className="w-16 h-16 bg-slate-50 dark:bg-slate-800/50 rounded-full flex items-center justify-center mb-3 border border-dashed border-slate-200 dark:border-slate-700 transition-colors">
+                        <FileText className="w-6 h-6 text-slate-300 dark:text-slate-600" />
                       </div>
-                      <p className="text-slate-500 text-sm font-medium">Belum ada riwayat medis</p>
+                      <p className="text-slate-500 dark:text-slate-400 text-sm font-medium transition-colors">Belum ada riwayat medis</p>
                     </div>
                   ) : (
-                    <div className="relative pl-3 border-l-2 border-slate-100 space-y-6 py-2">
+                    <div className="relative pl-3 border-l-2 border-slate-100 dark:border-slate-800 space-y-6 py-2 transition-colors">
                       {records.slice(0, 4).map((r, i) => (
                         <div key={r.id} className="relative">
                           {/* Timeline dot */}
-                          <div className="absolute -left-[17px] top-1 w-3 h-3 bg-white border-2 border-blue-500 rounded-full" />
+                          <div className="absolute -left-[17px] top-1 w-3 h-3 bg-white dark:bg-slate-900 border-2 border-blue-500 rounded-full transition-colors" />
                           
                           <div className="pl-4">
-                            <span className="text-xs font-bold text-blue-600 mb-1 block">
+                            <span className="text-xs font-bold text-blue-600 dark:text-blue-400 mb-1 block transition-colors">
                               {new Date(r.visit_date).toLocaleDateString("id-ID", { day: "numeric", month: "short", year: "numeric" })}
                             </span>
-                            <div className="bg-slate-50 border border-slate-100 rounded-xl p-3 hover:border-blue-200 transition-colors">
-                              <p className="text-sm font-bold text-slate-900">{r.diagnosis}</p>
+                            <div className="bg-slate-50 dark:bg-slate-950 border border-slate-100 dark:border-slate-800 rounded-xl p-3 hover:border-blue-200 dark:hover:border-blue-800 transition-colors">
+                              <p className="text-sm font-bold text-slate-900 dark:text-slate-200">{r.diagnosis}</p>
                             </div>
                           </div>
                         </div>
@@ -388,37 +388,37 @@ export default function PatientDashboard() {
 
               {/* Audit Trail — Vertical Timeline */}
               <motion.div initial={{ opacity: 0, y: 16 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.35 }}
-                className="bg-white border border-slate-200 rounded-2xl shadow-sm p-6 flex flex-col h-full">
+                className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl shadow-sm p-6 flex flex-col h-full transition-colors duration-300">
                 <div className="flex items-center justify-between gap-3 mb-6">
                   <div className="flex items-center gap-3">
-                    <div className="w-8 h-8 bg-emerald-50 rounded-lg flex items-center justify-center">
-                      <Shield className="w-4 h-4 text-emerald-600" />
+                    <div className="w-8 h-8 bg-emerald-50 dark:bg-emerald-900/30 rounded-lg flex items-center justify-center transition-colors">
+                      <Shield className="w-4 h-4 text-emerald-600 dark:text-emerald-400" />
                     </div>
-                    <h2 className="text-slate-900 font-bold text-base">Riwayat Akses</h2>
+                    <h2 className="text-slate-900 dark:text-white font-bold text-base transition-colors">Riwayat Akses</h2>
                   </div>
                   {!loading && auditLogs.length > 0 && (
-                    <span className="text-[10px] font-bold text-slate-400 uppercase tracking-widest">{auditLogs.length} log</span>
+                    <span className="text-[10px] font-bold text-slate-400 dark:text-slate-500 uppercase tracking-widest">{auditLogs.length} log</span>
                   )}
                 </div>
 
                 <div className="flex-1">
                   {loading ? (
                     <div className="space-y-4">
-                      {Array.from({length: 3}).map((_, i) => <Skeleton key={i} className="h-16 w-full rounded-xl" />)}
+                      {Array.from({length: 3}).map((_, i) => <Skeleton key={i} className="h-16 w-full rounded-xl dark:bg-slate-800" />)}
                     </div>
                   ) : auditLogs.length === 0 ? (
                     <div className="h-full flex flex-col items-center justify-center text-center py-8">
-                      <div className="w-16 h-16 bg-slate-50 rounded-full flex items-center justify-center mb-3 border border-dashed border-slate-200">
-                        <Clock className="w-6 h-6 text-slate-300" />
+                      <div className="w-16 h-16 bg-slate-50 dark:bg-slate-800/50 rounded-full flex items-center justify-center mb-3 border border-dashed border-slate-200 dark:border-slate-700 transition-colors">
+                        <Clock className="w-6 h-6 text-slate-300 dark:text-slate-600" />
                       </div>
-                      <p className="text-slate-500 text-sm font-medium">Belum ada riwayat akses</p>
-                      <p className="text-slate-400 text-xs mt-1">Log akan muncul setelah dokter mengakses data Anda</p>
+                      <p className="text-slate-500 dark:text-slate-400 text-sm font-medium transition-colors">Belum ada riwayat akses</p>
+                      <p className="text-slate-400 dark:text-slate-500 text-xs mt-1 transition-colors">Log akan muncul setelah dokter mengakses data Anda</p>
                     </div>
                   ) : (
                     // ✨ Tier 2.2 — Vertical Timeline View
                     <div className="relative">
                       {/* Vertical line */}
-                      <div className="absolute left-[15px] top-2 bottom-2 w-px bg-slate-100" />
+                      <div className="absolute left-[15px] top-2 bottom-2 w-px bg-slate-100 dark:bg-slate-800 transition-colors" />
 
                       <div className="space-y-4">
                         {auditLogs.slice(0, 5).map((log, i) => {
@@ -469,31 +469,31 @@ export default function PatientDashboard() {
                               {/* Content card */}
                               <div className={`flex-1 rounded-xl border p-3 transition-all hover:shadow-sm ${
                                 isEmergency
-                                  ? "bg-rose-50/50 border-rose-100"
+                                  ? "bg-rose-50/50 dark:bg-rose-950/30 border-rose-100 dark:border-rose-900/50"
                                   : isRevoked
-                                  ? "bg-slate-50 border-slate-100"
-                                  : "bg-slate-50 border-slate-100 hover:border-blue-200 hover:bg-blue-50/30"
+                                  ? "bg-slate-50 dark:bg-slate-900/50 border-slate-100 dark:border-slate-800"
+                                  : "bg-slate-50 dark:bg-slate-900/50 border-slate-100 dark:border-slate-800 hover:border-blue-200 dark:hover:border-blue-800 hover:bg-blue-50/30 dark:hover:bg-blue-900/20"
                               }`}>
                                 <div className="flex items-start justify-between gap-2">
                                   <div className="flex-1 min-w-0">
                                     <div className="flex items-center gap-1.5 flex-wrap">
-                                      <p className={`font-bold text-xs truncate ${
-                                        isEmergency ? "text-rose-700" : "text-slate-900"
+                                      <p className={`font-bold text-xs truncate transition-colors ${
+                                        isEmergency ? "text-rose-700 dark:text-rose-400" : "text-slate-900 dark:text-slate-200"
                                       }`}>
                                         {rawName}
                                       </p>
                                       {/* ✨ Tier 2.3: Verified SIP badge for all non-revoked doctors */}
                                       {!isRevoked && (
-                                        <span className="inline-flex items-center gap-0.5 px-1.5 py-0.5 rounded bg-blue-50 border border-blue-100 text-[9px] font-bold text-blue-600 shrink-0">
+                                        <span className="inline-flex items-center gap-0.5 px-1.5 py-0.5 rounded bg-blue-50 dark:bg-blue-900/30 border border-blue-100 dark:border-blue-800 text-[9px] font-bold text-blue-600 dark:text-blue-400 shrink-0 transition-colors">
                                           <ShieldCheck className="w-2.5 h-2.5" /> Terverifikasi
                                         </span>
                                       )}
                                     </div>
-                                    <p className="text-slate-400 text-[10px] mt-0.5">
+                                    <p className="text-slate-400 dark:text-slate-500 text-[10px] mt-0.5 transition-colors">
                                       {formatDistanceToNow(new Date(log.accessed_at), { addSuffix: true })}
                                     </p>
                                   </div>
-                                  <span className={`inline-flex items-center gap-1 px-1.5 py-0.5 rounded border text-[9px] font-bold uppercase tracking-wider shrink-0 ${badgeStyle}`}>
+                                  <span className={`inline-flex items-center gap-1 px-1.5 py-0.5 rounded border text-[9px] font-bold uppercase tracking-wider shrink-0 transition-colors ${badgeStyle} dark:bg-slate-900/50`}>
                                     {methodIcon}
                                     {log.access_method}
                                   </span>
@@ -508,7 +508,7 @@ export default function PatientDashboard() {
                 </div>
 
                 {!loading && auditLogs.length > 5 && (
-                  <button className="w-full mt-4 py-2 text-xs font-bold text-slate-400 hover:text-blue-600 transition-colors">
+                  <button className="w-full mt-4 py-2 text-xs font-bold text-slate-400 dark:text-slate-500 hover:text-blue-600 dark:hover:text-blue-400 transition-colors">
                     Lihat Semua {auditLogs.length} Log →
                   </button>
                 )}
