@@ -335,8 +335,9 @@ func (h *Handler) GetPatientSummaryAI(c *gin.Context) {
 	// Call Groq AI
 	apiKey := os.Getenv("GROQ_API_KEY")
 	if apiKey == "" {
-		// Fallback for user request
-		apiKey = "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"
+		fmt.Println("Groq API Error: GROQ_API_KEY environment variable is not set")
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "AI service is not configured (missing API key)"})
+		return
 	}
 
 	prompt := "You are a professional medical assistant. Read the following patient records and provide a quick 3-bullet summary in Indonesian. Focus on chronic conditions, recent major issues, and highlight any potential drug interactions or warnings. Be very concise and professional.\n\nRecords:\n" + contextText
