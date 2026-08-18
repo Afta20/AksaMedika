@@ -278,8 +278,8 @@ function DashboardContent() {
         const aiRes = await doctorApi.getPatientSummaryAI(patientId, token);
         setAiSummary(aiRes.summary);
       } catch (err) {
-        console.error("AI Error", err);
-        setAiSummary("Gagal memuat ringkasan AI. Silakan periksa koneksi atau kuota API.");
+        const errMsg = err instanceof Error ? err.message : String(err);
+        setAiSummary(`Gagal memuat ringkasan AI: ${errMsg}`);
       } finally {
         setLoadingAi(false);
       }
