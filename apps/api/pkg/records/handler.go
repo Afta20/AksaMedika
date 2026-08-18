@@ -256,21 +256,25 @@ func nullIfEmpty(s string) interface{} {
 	return s
 }
 
-// GroqRequest/Response structures
-type GroqMessage struct {
-	Role    string `json:"role"`
-	Content string `json:"content"`
+// Gemini API structures
+type GeminiPart struct {
+	Text string `json:"text"`
 }
 
-type GroqPayload struct {
-	Model    string        `json:"model"`
-	Messages []GroqMessage `json:"messages"`
+type GeminiContent struct {
+	Parts []GeminiPart `json:"parts"`
 }
 
-type GroqResponse struct {
-	Choices []struct {
-		Message GroqMessage `json:"message"`
-	} `json:"choices"`
+type GeminiPayload struct {
+	Contents []GeminiContent `json:"contents"`
+}
+
+type GeminiResponse struct {
+	Candidates []struct {
+		Content struct {
+			Parts []GeminiPart `json:"parts"`
+		} `json:"content"`
+	} `json:"candidates"`
 }
 
 // GetPatientSummaryAI fetches the patient records and asks Groq AI to summarize them.
@@ -332,49 +336,48 @@ func (h *Handler) GetPatientSummaryAI(c *gin.Context) {
 		return
 	}
 
-	// Call Groq AI
-	apiKey := os.Getenv("GROQ_API_KEY")
+	// Call Gemini AI
+	apiKey := os.Getenv("GEMINI_API_KEY")
 	if apiKey == "" {
-		fmt.Println("Groq API Error: GROQ_API_KEY environment variable is not set")
+		fmt.Println("Gemini API Error: GEMINI_API_KEY environment variable is not set")
 		c.JSON(http.StatusInternalServerError, gin.H{"error": "AI service is not configured (missing API key)"})
 		return
 	}
 
 	prompt := "You are a professional medical assistant. Read the following patient records and provide a quick 3-bullet summary in Indonesian. Focus on chronic conditions, recent major issues, and highlight any potential drug interactions or warnings. Be very concise and professional.\n\nRecords:\n" + contextText
 
-	payload := GroqPayload{
-		Model: "llama-3.1-8b-instant",
-		Messages: []GroqMessage{
-			{Role: "user", Content: prompt},
+	payload := GeminiPayload{
+		Contents: []GeminiContent{
+			{Parts: []GeminiPart{{Text: prompt}}},
 		},
 	}
 
 	jsonData, _ := json.Marshal(payload)
-	req, _ := http.NewRequest("POST", "https://api.groq.com/openai/v1/chat/completions", bytes.NewBuffer(jsonData))
-	req.Header.Set("Authorization", "Bearer "+apiKey)
+	url := "https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=" + apiKey
+	req, _ := http.NewRequest("POST", url, bytes.NewBuffer(jsonData))
 	req.Header.Set("Content-Type", "application/json")
 
 	client := &http.Client{Timeout: 10 * time.Second}
 	resp, err := client.Do(req)
 	if err != nil {
-		fmt.Println("Groq HTTP Error:", err)
+		fmt.Println("Gemini HTTP Error:", err)
 		c.JSON(http.StatusInternalServerError, gin.H{"error": "AI service unavailable"})
 		return
 	}
 	if resp.StatusCode != 200 {
 		body, _ := io.ReadAll(resp.Body)
-		fmt.Printf("Groq API Error: %d - %s\n", resp.StatusCode, string(body))
+		fmt.Printf("Gemini API Error: %d - %s\n", resp.StatusCode, string(body))
 		c.JSON(http.StatusInternalServerError, gin.H{"error": "AI service unavailable"})
 		return
 	}
 	defer resp.Body.Close()
 
-	var groqResp GroqResponse
-	if err := json.NewDecoder(resp.Body).Decode(&groqResp); err != nil || len(groqResp.Choices) == 0 {
+	var geminiResp GeminiResponse
+	if err := json.NewDecoder(resp.Body).Decode(&geminiResp); err != nil || len(geminiResp.Candidates) == 0 || len(geminiResp.Candidates[0].Content.Parts) == 0 {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to parse AI response"})
 		return
 	}
 
-	c.JSON(http.StatusOK, gin.H{"summary": groqResp.Choices[0].Message.Content})
+	c.JSON(http.StatusOK, gin.H{"summary": geminiResp.Candidates[0].Content.Parts[0].Text})
 }
 

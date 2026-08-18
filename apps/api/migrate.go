@@ -53,5 +53,23 @@ func main() {
 		log.Fatalf("failed to alter medical_records: %v", err)
 	}
 
+	// 3. Fix audit_logs constraints for RevokeAccess
+	fmt.Println("Altering audit_logs to allow NULL doctor_id...")
+	_, err = pool.Exec(context.Background(), "ALTER TABLE audit_logs ALTER COLUMN doctor_id DROP NOT NULL;")
+	if err != nil {
+		log.Printf("failed to alter doctor_id: %v", err)
+	}
+
+	fmt.Println("Altering audit_logs access_method constraint...")
+	_, err = pool.Exec(context.Background(), "ALTER TABLE audit_logs DROP CONSTRAINT IF EXISTS audit_logs_access_method_check;")
+	if err != nil {
+		log.Printf("failed to drop constraint: %v", err)
+	}
+	
+	_, err = pool.Exec(context.Background(), "ALTER TABLE audit_logs ADD CONSTRAINT audit_logs_access_method_check CHECK (access_method IN ('PIN', 'QR', 'EMERGENCY', 'REVOKED'));")
+	if err != nil {
+		log.Printf("failed to add constraint: %v", err)
+	}
+
 	fmt.Println("Migrations completed successfully!")
 }
