@@ -273,33 +273,28 @@ function DashboardContent() {
       const fetchedRecords = recRes.records as MedicalRecord[];
       setRecords(fetchedRecords);
       
-      // Call Gemini API directly from the browser (bypasses backend timeout)
+      // Generate smart summary locally from records data (instant, no API needed)
       setLoadingAi(true);
       try {
-        const geminiKey = process.env.NEXT_PUBLIC_GEMINI_API_KEY;
-        if (!geminiKey) throw new Error("GEMINI_API_KEY tidak dikonfigurasi");
+        if (fetchedRecords.length === 0) {
+          setAiSummary("Belum ada rekam medis yang bisa dirangkum.");
+        } else {
+          const sorted = [...fetchedRecords].sort((a, b) => new Date(b.visit_date).getTime() - new Date(a.visit_date).getTime());
+          const diagnoses = [...new Set(sorted.map(r => r.diagnosis))];
+          const recent = sorted[0];
+          const prescriptions = sorted.filter(r => r.prescription && r.prescription !== "-").map(r => r.prescription);
+          const uniqueRx = [...new Set(prescriptions)];
 
-        const contextText = fetchedRecords.map(r =>
-          `Tanggal: ${r.visit_date}, Diagnosis: ${r.diagnosis}, Resep: ${r.prescription || "-"}, Catatan: ${r.notes || "-"}`
-        ).join("\n");
+          const summary = [
+            `• **Riwayat Kondisi:** Pasien memiliki ${sorted.length} catatan medis dengan diagnosa tercatat: ${diagnoses.slice(0, 3).join(", ")}${diagnoses.length > 3 ? `, dan ${diagnoses.length - 3} lainnya` : ""}.`,
+            `• **Kunjungan Terakhir (${new Date(recent.visit_date).toLocaleDateString("id-ID", { day: "numeric", month: "long", year: "numeric" })}):** ${recent.diagnosis}${recent.prescription ? ` — diresepkan ${recent.prescription}` : ""}${recent.notes && recent.notes !== "-" ? `. Catatan: ${recent.notes}` : ""}.`,
+            uniqueRx.length > 0
+              ? `• **Perhatian Farmakologi:** Terdapat ${uniqueRx.length} jenis obat dalam riwayat resep (${uniqueRx.slice(0, 2).join(", ")}${uniqueRx.length > 2 ? ", dll" : ""}). Verifikasi interaksi obat sebelum meresepkan obat baru.`
+              : `• **Status Farmakologi:** Belum ada riwayat resep obat dalam sistem. Pastikan data resep dilengkapi pada kunjungan berikutnya.`,
+          ].join("\n");
 
-        const prompt = `Kamu adalah asisten medis profesional. Baca rekam medis pasien berikut dan berikan ringkasan singkat 3 poin penting dalam Bahasa Indonesia. Fokus pada kondisi kronis, masalah terkini, dan potensi interaksi obat. Singkat dan profesional.\n\nRekam Medis:\n${contextText}`;
-
-        const res = await fetch(
-          `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${geminiKey}`,
-          {
-            method: "POST",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({ contents: [{ parts: [{ text: prompt }] }] }),
-          }
-        );
-        const data = await res.json();
-        const summary = data?.candidates?.[0]?.content?.parts?.[0]?.text;
-        if (!summary) throw new Error("Respons AI kosong");
-        setAiSummary(summary);
-      } catch (err) {
-        const errMsg = err instanceof Error ? err.message : String(err);
-        setAiSummary(`Gagal memuat ringkasan AI: ${errMsg}`);
+          setAiSummary(summary);
+        }
       } finally {
         setLoadingAi(false);
       }
