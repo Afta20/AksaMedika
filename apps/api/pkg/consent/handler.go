@@ -263,11 +263,12 @@ func (h *Handler) RevokeAccess(c *gin.Context) {
 	// Insert a REVOKED audit log to signal that the session is dead
 	_, err := h.db.Exec(context.Background(),
 		`INSERT INTO audit_logs (patient_id, doctor_id, doctor_name, access_method, ip_address)
-		 VALUES ($1, $1, $2, 'REVOKED', 'Pasien mencabut izin akses')`,
+		 VALUES ($1, NULL, $2, 'REVOKED', 'Pasien mencabut izin akses')`,
 		patientID, patientName,
 	)
 
 	if err != nil {
+		fmt.Printf("RevokeAccess DB Error: %v\n", err)
 		c.JSON(http.StatusInternalServerError, gin.H{"error": "Gagal mencabut izin akses"})
 		return
 	}
