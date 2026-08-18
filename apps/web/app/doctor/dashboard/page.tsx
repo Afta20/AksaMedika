@@ -286,7 +286,7 @@ function DashboardContent() {
         const prompt = `Kamu adalah asisten medis profesional. Baca rekam medis pasien berikut dan berikan ringkasan singkat 3 poin penting dalam Bahasa Indonesia. Fokus pada kondisi kronis, masalah terkini, dan potensi interaksi obat. Singkat dan profesional.\n\nRekam Medis:\n${contextText}`;
 
         const res = await fetch(
-          `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash-lite:generateContent?key=${geminiKey}`,
+          `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${geminiKey}`,
           {
             method: "POST",
             headers: { "Content-Type": "application/json" },
