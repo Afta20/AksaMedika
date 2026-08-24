@@ -126,7 +126,21 @@ func (h *Handler) ValidateAccess(c *gin.Context) {
 			  AND at.expires_at > now()
 			LIMIT 1`
 		arg = req.PIN
+
+		err := h.db.QueryRow(context.Background(), query, arg).
+			Scan(&tokenID, &patientID, &patientName)
+		if err != nil {
+			c.JSON(http.StatusUnauthorized, gin.H{"error": "Invalid or expired access code"})
+			return
+		}
+
+		// Mark token as used (single-use)
+		_, _ = h.db.Exec(context.Background(),
+			`UPDATE access_tokens SET is_used = true WHERE id = $1`,
+			tokenID,
+		)
 	} else {
+		// First check if it's a dynamic access_token QR
 		query = `
 			SELECT at.id, at.patient_id, u.name
 			FROM access_tokens at
@@ -135,24 +149,32 @@ func (h *Handler) ValidateAccess(c *gin.Context) {
 			  AND at.is_used = false
 			  AND at.expires_at > now()
 			LIMIT 1`
-		arg = req.QRPayload
-	}
+		err := h.db.QueryRow(context.Background(), query, req.QRPayload).
+			Scan(&tokenID, &patientID, &patientName)
 
-	err := h.db.QueryRow(context.Background(), query, arg).
-		Scan(&tokenID, &patientID, &patientName)
-	if err != nil {
-		c.JSON(http.StatusUnauthorized, gin.H{"error": "Invalid or expired access code"})
-		return
-	}
+		if err == nil {
+			// Mark token as used
+			_, _ = h.db.Exec(context.Background(),
+				`UPDATE access_tokens SET is_used = true WHERE id = $1`,
+				tokenID,
+			)
+		} else {
+			// Fallback: check if QR payload is formatted as "PATIENT:<uuid>" or a raw patient ID
+			cleanID := req.QRPayload
+			if len(cleanID) > 8 && cleanID[:8] == "PATIENT:" {
+				cleanID = cleanID[8:]
+			}
 
-	// Mark token as used (single-use)
-	_, err = h.db.Exec(context.Background(),
-		`UPDATE access_tokens SET is_used = true WHERE id = $1`,
-		tokenID,
-	)
-	if err != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to consume token"})
-		return
+			err = h.db.QueryRow(context.Background(),
+				`SELECT id, name FROM users WHERE id = $1 AND role = 'patient'`,
+				cleanID,
+			).Scan(&patientID, &patientName)
+
+			if err != nil {
+				c.JSON(http.StatusUnauthorized, gin.H{"error": "QR Code tidak valid atau pasien tidak ditemukan"})
+				return
+			}
+		}
 	}
 
 	// Write audit log
