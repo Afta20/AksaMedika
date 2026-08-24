@@ -183,7 +183,7 @@ func (h *Handler) ValidateAccess(c *gin.Context) {
 		method = "PIN"
 	}
 
-	_, err = h.db.Exec(context.Background(),
+	_, err := h.db.Exec(context.Background(),
 		`INSERT INTO audit_logs (patient_id, doctor_id, doctor_name, access_method, ip_address)
 		 VALUES ($1, $2, $3, $4, $5)`,
 		patientID, doctorID, doctorName, method, c.ClientIP(),
