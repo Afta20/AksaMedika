@@ -143,23 +143,23 @@ function DashboardContent() {
   const emergencyParam = searchParams?.get("emergency");
   const emergencyName = searchParams?.get("name");
   
-  const { setTheme, theme } = useTheme();
-  const [autoNightShift, setAutoNightShift] = useState(true);
+  const { setTheme } = useTheme();
+  const [autoNightShift, setAutoNightShift] = useState(false);
+  const nightShiftCheckedRef = useRef(false);
 
-  // 🌙 Smart Auto Night Shift (18:00 - 06:00 WIB)
+  // 🌙 Smart Auto Night Shift (18:00 - 06:00 WIB) — Runs only once when enabled
   useEffect(() => {
-    if (autoNightShift) {
+    if (autoNightShift && !nightShiftCheckedRef.current) {
+      nightShiftCheckedRef.current = true;
       const hour = new Date().getHours();
       if (hour >= 18 || hour < 6) {
-        if (theme !== "dark") {
-          setTheme("dark");
-          toast("🌙 Mode Jaga Malam Aktif", {
-            description: "Otomatis beralih ke Dark Mode (18:00 - 06:00) demi kenyamanan mata dokter saat piket malam.",
-          });
-        }
+        setTheme("dark");
+        toast("🌙 Mode Jaga Malam Aktif", {
+          description: "Beralih ke Dark Mode (18:00 - 06:00) demi kenyamanan mata dokter saat piket malam.",
+        });
       }
     }
-  }, [autoNightShift, theme, setTheme]);
+  }, [autoNightShift, setTheme]);
 
   // Doctor Data
   const [profile, setProfile] = useState<DoctorProfile | null>(null);
@@ -546,6 +546,7 @@ function DashboardContent() {
               onClick={() => {
                 const next = !autoNightShift;
                 setAutoNightShift(next);
+                nightShiftCheckedRef.current = false;
                 if (next) {
                   const hour = new Date().getHours();
                   if (hour >= 18 || hour < 6) setTheme("dark");
