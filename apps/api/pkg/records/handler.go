@@ -342,39 +342,56 @@ func (h *Handler) GetPatientSummaryAI(c *gin.Context) {
 
 	prompt := "You are a professional medical assistant. Read the following patient records and provide a quick 3-bullet summary in Indonesian. Focus on chronic conditions, recent major issues, and highlight any potential drug interactions or warnings. Be very concise and professional.\n\nRecords:\n" + contextText
 
-	payload := GroqPayload{
-		Model:    "llama-3.1-8b-instant",
-		Messages: []GroqMessage{{Role: "user", Content: prompt}},
+	// Try models in order of preference (most current first)
+	modelsToTry := []string{
+		"openai/gpt-oss-20b",
+		"llama-3.3-70b-versatile",
+		"llama-3.1-8b-instant",
 	}
 
-	jsonData, _ := json.Marshal(payload)
-	req, _ := http.NewRequest("POST", "https://api.groq.com/openai/v1/chat/completions", bytes.NewBuffer(jsonData))
-	req.Header.Set("Authorization", "Bearer "+apiKey)
-	req.Header.Set("Content-Type", "application/json")
+	var summaryText string
+	for _, model := range modelsToTry {
+		payload := GroqPayload{
+			Model:    model,
+			Messages: []GroqMessage{{Role: "user", Content: prompt}},
+		}
 
-	client := &http.Client{Timeout: 15 * time.Second}
-	resp, err := client.Do(req)
-	if err != nil {
-		fmt.Println("[AI ERROR] Groq HTTP error:", err)
-		c.JSON(http.StatusInternalServerError, gin.H{"error": "AI service unavailable"})
+		jsonData, _ := json.Marshal(payload)
+		req, _ := http.NewRequest("POST", "https://api.groq.com/openai/v1/chat/completions", bytes.NewBuffer(jsonData))
+		req.Header.Set("Authorization", "Bearer "+apiKey)
+		req.Header.Set("Content-Type", "application/json")
+
+		client := &http.Client{Timeout: 20 * time.Second}
+		resp, err := client.Do(req)
+		if err != nil {
+			fmt.Printf("[AI] Model %s HTTP error: %v\n", model, err)
+			continue
+		}
+
+		body, _ := io.ReadAll(resp.Body)
+		resp.Body.Close()
+
+		if resp.StatusCode != 200 {
+			fmt.Printf("[AI] Model %s returned %d: %s\n", model, resp.StatusCode, string(body))
+			continue
+		}
+
+		var groqResp GroqResponse
+		if err := json.Unmarshal(body, &groqResp); err != nil || len(groqResp.Choices) == 0 {
+			fmt.Printf("[AI] Model %s parse error: %s\n", model, string(body))
+			continue
+		}
+
+		summaryText = groqResp.Choices[0].Message.Content
+		fmt.Printf("[AI] Successfully used model: %s\n", model)
+		break
+	}
+
+	if summaryText == "" {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "All AI models unavailable. Check GROQ_API_KEY permissions."})
 		return
 	}
-	defer resp.Body.Close()
 
-	body, _ := io.ReadAll(resp.Body)
-	if resp.StatusCode != 200 {
-		fmt.Printf("[AI ERROR] Groq returned %d: %s\n", resp.StatusCode, string(body))
-		c.JSON(http.StatusInternalServerError, gin.H{"error": fmt.Sprintf("Groq error %d", resp.StatusCode)})
-		return
-	}
-
-	var groqResp GroqResponse
-	if err := json.Unmarshal(body, &groqResp); err != nil || len(groqResp.Choices) == 0 {
-		fmt.Println("[AI ERROR] Failed to parse Groq response:", string(body))
-		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to parse AI response"})
-		return
-	}
-
-	c.JSON(http.StatusOK, gin.H{"summary": groqResp.Choices[0].Message.Content})
+	c.JSON(http.StatusOK, gin.H{"summary": summaryText})
 }
 
