@@ -273,28 +273,15 @@ function DashboardContent() {
       const fetchedRecords = recRes.records as MedicalRecord[];
       setRecords(fetchedRecords);
       
-      // Generate smart summary locally from records data (instant, no API needed)
+      // Fetch AI Summary from backend (Groq)
       setLoadingAi(true);
       try {
-        if (fetchedRecords.length === 0) {
-          setAiSummary("Belum ada rekam medis yang bisa dirangkum.");
-        } else {
-          const sorted = [...fetchedRecords].sort((a, b) => new Date(b.visit_date).getTime() - new Date(a.visit_date).getTime());
-          const diagnoses = [...new Set(sorted.map(r => r.diagnosis))];
-          const recent = sorted[0];
-          const prescriptions = sorted.filter(r => r.prescription && r.prescription !== "-").map(r => r.prescription);
-          const uniqueRx = [...new Set(prescriptions)];
-
-          const summary = [
-            `• **Riwayat Kondisi:** Pasien memiliki ${sorted.length} catatan medis dengan diagnosa tercatat: ${diagnoses.slice(0, 3).join(", ")}${diagnoses.length > 3 ? `, dan ${diagnoses.length - 3} lainnya` : ""}.`,
-            `• **Kunjungan Terakhir (${new Date(recent.visit_date).toLocaleDateString("id-ID", { day: "numeric", month: "long", year: "numeric" })}):** ${recent.diagnosis}${recent.prescription ? ` — diresepkan ${recent.prescription}` : ""}${recent.notes && recent.notes !== "-" ? `. Catatan: ${recent.notes}` : ""}.`,
-            uniqueRx.length > 0
-              ? `• **Perhatian Farmakologi:** Terdapat ${uniqueRx.length} jenis obat dalam riwayat resep (${uniqueRx.slice(0, 2).join(", ")}${uniqueRx.length > 2 ? ", dll" : ""}). Verifikasi interaksi obat sebelum meresepkan obat baru.`
-              : `• **Status Farmakologi:** Belum ada riwayat resep obat dalam sistem. Pastikan data resep dilengkapi pada kunjungan berikutnya.`,
-          ].join("\n");
-
-          setAiSummary(summary);
-        }
+        const aiRes = await doctorApi.getPatientSummaryAI(patientId, token);
+        setAiSummary(aiRes.summary);
+      } catch (err) {
+        const errMsg = err instanceof Error ? err.message : String(err);
+        console.error("[AI Summary Error]", errMsg);
+        setAiSummary(`Gagal memuat ringkasan AI: ${errMsg}`);
       } finally {
         setLoadingAi(false);
       }
