@@ -37,13 +37,25 @@ export default function QRScanner({ onScanSuccess, onScanFailure }: QRScannerPro
   }, [onScanSuccess, onScanFailure]);
 
   return (
-    <div className="w-full bg-white p-4 rounded-2xl border border-slate-200">
-      <div id="qr-reader" className="w-full mx-auto overflow-hidden rounded-xl" />
+    <div className="w-full bg-white dark:bg-slate-900 p-4 rounded-2xl border border-slate-200 dark:border-slate-800 transition-colors">
+      <div id="qr-reader" className="w-full mx-auto overflow-hidden rounded-xl border-0" />
+      
+      {/* Friendly Camera Permission Helper Banner */}
+      <div className="mt-3 p-3 bg-blue-50 dark:bg-blue-950/30 border border-blue-100 dark:border-blue-900/50 rounded-xl text-center">
+        <p className="text-xs font-bold text-blue-700 dark:text-blue-400">
+          💡 Tips Scanner Kamera
+        </p>
+        <p className="text-[11px] text-slate-600 dark:text-slate-400 mt-0.5 leading-relaxed">
+          Posisikan QR Code di dalam kotak di atas. Jika kamera tidak aktif, pastikan Anda telah menekan tombol <strong className="text-slate-800 dark:text-slate-200">"Allow" / "Izinkan"</strong> pada pop-up izin browser.
+        </p>
+      </div>
+
       <style jsx global>{`
         #qr-reader { border: none !important; }
         #qr-reader img { display: none !important; }
         #qr-reader__dashboard_section_csr span { display: none !important; }
         #qr-reader__dashboard_section_swaplink { display: none !important; }
+        #qr-reader__status_span { font-size: 12px !important; font-weight: 600 !important; color: #475569 !important; }
       `}</style>
     </div>
   );

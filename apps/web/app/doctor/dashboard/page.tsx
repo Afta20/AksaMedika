@@ -7,7 +7,7 @@ import {
   Shield, LogOut, Stethoscope, Users, Search, ChevronRight,
   Loader2, CheckCircle2, AlertCircle, FileText, Calendar, Pill,
   ClipboardList, Lock, Activity, Plus, X, User as UserIcon, Clock,
-  QrCode, Zap, Sparkles, TriangleAlert, Download
+  QrCode, Zap, Sparkles, TriangleAlert, Download, ShieldCheck
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -533,78 +533,148 @@ function DashboardContent() {
         <AnimatePresence mode="wait">
           {/* === ACCESS PORTAL === */}
           {!patient && !showQR && !showEmergency && (
-            <motion.div key="pin-entry" initial={{ opacity: 0, y: 16 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -16 }} className="max-w-md">
-              <Card className={`border shadow-sm transition-all bg-white dark:bg-slate-900 ${
-                state === "error" ? "border-rose-300 dark:border-rose-800 shadow-rose-100 dark:shadow-none" : "border-slate-200 dark:border-slate-800"
-              }`}>
-                <CardContent className="pt-8 pb-8 px-8">
-                  <div className="text-center mb-8">
-                    <div className={`w-16 h-16 rounded-2xl flex items-center justify-center mx-auto mb-4 transition-all ${
-                      state === "loading" ? "bg-blue-50 dark:bg-blue-900/20"
-                      : state === "error" ? "bg-rose-50 dark:bg-rose-900/20"
-                      : "bg-slate-100 dark:bg-slate-800"
-                    }`}>
-                      {state === "loading"
-                        ? <Loader2 className="w-8 h-8 text-blue-600 dark:text-blue-400 animate-spin" />
-                        : state === "error"
-                        ? <AlertCircle className="w-8 h-8 text-rose-500 dark:text-rose-400" />
-                        : <Lock className="w-8 h-8 text-slate-400 dark:text-slate-500" />
-                      }
+            <motion.div key="pin-entry" initial={{ opacity: 0, y: 16 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -16 }}
+              className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
+              
+              {/* Left Column: PIN Form */}
+              <div className="lg:col-span-5 space-y-6">
+                <Card className={`border shadow-sm transition-all bg-white dark:bg-slate-900 ${
+                  state === "error" ? "border-rose-300 dark:border-rose-800 shadow-rose-100 dark:shadow-none" : "border-slate-200 dark:border-slate-800"
+                }`}>
+                  <CardContent className="pt-8 pb-8 px-8">
+                    <div className="text-center mb-8">
+                      <div className={`w-16 h-16 rounded-2xl flex items-center justify-center mx-auto mb-4 transition-all ${
+                        state === "loading" ? "bg-blue-50 dark:bg-blue-900/20"
+                        : state === "error" ? "bg-rose-50 dark:bg-rose-900/20"
+                        : "bg-slate-100 dark:bg-slate-800"
+                      }`}>
+                        {state === "loading"
+                          ? <Loader2 className="w-8 h-8 text-blue-600 dark:text-blue-400 animate-spin" />
+                          : state === "error"
+                          ? <AlertCircle className="w-8 h-8 text-rose-500 dark:text-rose-400" />
+                          : <Lock className="w-8 h-8 text-slate-400 dark:text-slate-500" />
+                        }
+                      </div>
+                      <h2 className="text-xl font-extrabold text-slate-900 dark:text-white transition-colors">Masukkan PIN Pasien</h2>
                     </div>
-                    <h2 className="text-xl font-extrabold text-slate-900 dark:text-white transition-colors">Masukkan PIN Pasien</h2>
+
+                    <div className={`flex gap-2 sm:gap-3 justify-center mb-6 ${shaking ? "shake" : ""}`}>
+                      {pin.map((digit, i) => (
+                        <input key={i}
+                          ref={(el) => inputRefs(el, i)}
+                          type="password" inputMode="numeric" maxLength={1} value={digit}
+                          onChange={(e) => handlePinChange(e.target.value, i)}
+                          onKeyDown={(e) => handlePinKeyDown(e, i)}
+                          disabled={state === "loading"}
+                          className={`w-11 h-14 sm:w-12 sm:h-14 text-center text-2xl font-extrabold rounded-xl border-2 outline-none transition-all
+                            ${state === "error"
+                              ? "border-rose-400 dark:border-rose-800 text-rose-500 dark:text-rose-400 bg-rose-50 dark:bg-rose-950/30"
+                              : digit
+                              ? "border-blue-500 dark:border-blue-700 text-blue-700 dark:text-blue-400 bg-blue-50 dark:bg-blue-900/30"
+                              : "border-slate-200 dark:border-slate-800 text-slate-900 dark:text-white bg-white dark:bg-slate-950 focus:border-blue-400 dark:focus:border-blue-700 focus:bg-blue-50/30 dark:focus:bg-blue-900/10"
+                            }`}
+                        />
+                      ))}
+                    </div>
+
+                    {state === "error" && (
+                      <motion.p initial={{ opacity: 0 }} animate={{ opacity: 1 }}
+                        className="text-rose-500 text-sm text-center mb-4 font-semibold">
+                        PIN tidak valid atau sudah kedaluwarsa.
+                      </motion.p>
+                    )}
+
+                    <div className="space-y-3">
+                      <Button onClick={handleSubmitPin}
+                        disabled={state === "loading" || pin.join("").length !== 6}
+                        className="w-full h-12 bg-blue-600 hover:bg-blue-700 text-white font-bold rounded-xl shadow-md text-sm">
+                        {state === "loading"
+                          ? <><Loader2 className="w-4 h-4 mr-2 animate-spin" /> Memverifikasi PIN...</>
+                          : <>Verifikasi & Akses Rekam Medis <ChevronRight className="w-4 h-4 ml-1" /></>
+                        }
+                      </Button>
+
+                      <Button onClick={() => setShowQR(true)} variant="outline"
+                        disabled={state === "loading"}
+                        className="w-full h-12 border-blue-200 text-blue-700 dark:text-blue-400 hover:bg-blue-50 dark:hover:bg-blue-950/40 font-bold rounded-xl shadow-sm text-sm">
+                        <QrCode className="w-4 h-4 mr-2" /> Scan QR Code via Kamera
+                      </Button>
+                    </div>
+                  </CardContent>
+                </Card>
+
+                {/* Break-Glass Emergency Access CTA */}
+                <div className="text-center">
+                  <button onClick={() => setShowEmergency(true)} className="inline-flex items-center justify-center gap-2 px-5 py-2.5 text-rose-600 dark:text-rose-400 bg-rose-50 dark:bg-rose-950/40 hover:bg-rose-100 dark:hover:bg-rose-900/40 border border-rose-200 dark:border-rose-900/50 rounded-full text-xs font-bold transition-all shadow-sm cursor-pointer">
+                    <TriangleAlert className="w-4 h-4 text-rose-500" />
+                    Akses Darurat UGD (Break-Glass Override)
+                  </button>
+                </div>
+              </div>
+
+              {/* Right Column: Security Telemetry & Quick Access Guide */}
+              <div className="lg:col-span-7 space-y-6">
+                
+                {/* Zero-Trust Telemetry Suite */}
+                <div className="bg-gradient-to-br from-slate-900 via-slate-900 to-slate-800 text-white rounded-3xl p-6 sm:p-8 border border-slate-700 shadow-xl relative overflow-hidden">
+                  <div className="absolute top-0 right-0 w-64 h-64 bg-blue-500/10 rounded-full blur-3xl" />
+                  <div className="flex items-center justify-between mb-6 relative z-10">
+                    <div className="flex items-center gap-3">
+                      <div className="w-10 h-10 bg-blue-500/20 backdrop-blur-md rounded-xl flex items-center justify-center border border-blue-400/30">
+                        <ShieldCheck className="w-5 h-5 text-blue-400" />
+                      </div>
+                      <div>
+                        <h3 className="font-bold text-base">Protokol Keamanan Aksamedika</h3>
+                        <p className="text-blue-300 text-xs font-medium">Standard Medik Digital Zero-Trust</p>
+                      </div>
+                    </div>
+                    <Badge className="bg-emerald-500/20 text-emerald-300 border-emerald-500/30 text-xs px-2.5 py-1">Aktif & Terverifikasi</Badge>
                   </div>
 
-                  <div className={`flex gap-2 sm:gap-3 justify-center mb-6 ${shaking ? "shake" : ""}`}>
-                    {pin.map((digit, i) => (
-                      <input key={i}
-                        ref={(el) => inputRefs(el, i)}
-                        type="password" inputMode="numeric" maxLength={1} value={digit}
-                        onChange={(e) => handlePinChange(e.target.value, i)}
-                        onKeyDown={(e) => handlePinKeyDown(e, i)}
-                        disabled={state === "loading"}
-                        className={`w-11 h-14 sm:w-12 sm:h-14 text-center text-2xl font-extrabold rounded-xl border-2 outline-none transition-all
-                          ${state === "error"
-                            ? "border-rose-400 dark:border-rose-800 text-rose-500 dark:text-rose-400 bg-rose-50 dark:bg-rose-950/30"
-                            : digit
-                            ? "border-blue-500 dark:border-blue-700 text-blue-700 dark:text-blue-400 bg-blue-50 dark:bg-blue-900/30"
-                            : "border-slate-200 dark:border-slate-800 text-slate-900 dark:text-white bg-white dark:bg-slate-950 focus:border-blue-400 dark:focus:border-blue-700 focus:bg-blue-50/30 dark:focus:bg-blue-900/10"
-                          }`}
-                      />
+                  <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 relative z-10">
+                    <div className="bg-white/5 backdrop-blur-md p-4 rounded-2xl border border-white/10">
+                      <p className="text-slate-400 text-[10px] uppercase tracking-wider font-bold">Enkripsi Rekam</p>
+                      <p className="text-white font-mono font-bold text-sm mt-1">AES-256 GCM</p>
+                      <p className="text-slate-400 text-[10px] mt-0.5">End-to-End Encrypted</p>
+                    </div>
+                    <div className="bg-white/5 backdrop-blur-md p-4 rounded-2xl border border-white/10">
+                      <p className="text-slate-400 text-[10px] uppercase tracking-wider font-bold">Durasi Akses</p>
+                      <p className="text-white font-mono font-bold text-sm mt-1">30 Menit</p>
+                      <p className="text-slate-400 text-[10px] mt-0.5">Single-Use Token</p>
+                    </div>
+                    <div className="bg-white/5 backdrop-blur-md p-4 rounded-2xl border border-white/10">
+                      <p className="text-slate-400 text-[10px] uppercase tracking-wider font-bold">Jejak Audit</p>
+                      <p className="text-white font-mono font-bold text-sm mt-1">SHA-256 Hash</p>
+                      <p className="text-slate-400 text-[10px] mt-0.5">Immutable Ledger</p>
+                    </div>
+                  </div>
+                </div>
+
+                {/* Quick Access Guide */}
+                <div className="bg-white dark:bg-slate-900 rounded-3xl p-6 sm:p-8 border border-slate-200 dark:border-slate-800 shadow-sm transition-colors">
+                  <h3 className="font-bold text-slate-900 dark:text-white text-sm mb-4 flex items-center gap-2">
+                    <Activity className="w-4 h-4 text-blue-600 dark:text-blue-400" />
+                    Panduan Akses Pasien Bagi Dokter
+                  </h3>
+                  <div className="space-y-3.5">
+                    {[
+                      { step: "01", title: "Minta PIN 6-Digit dari Pasien", desc: "Pasien meng-generate PIN dari menu 'Buat Token Akses' di aplikasi pasien." },
+                      { step: "02", title: "Atau Scan QR Code Langsung", desc: "Ketuk 'Scan QR Code' dan arahkan kamera ke Kartu Identitas Digital pada HP pasien." },
+                      { step: "03", title: "Break-Glass Protocol UGD", desc: "Jika pasien tidak sadarkan diri di UGD, gunakan fitur Akses Darurat dengan NIK pasien." },
+                    ].map((item) => (
+                      <div key={item.step} className="flex items-start gap-3.5 p-3.5 rounded-2xl bg-slate-50 dark:bg-slate-950 border border-slate-100 dark:border-slate-800 transition-colors">
+                        <span className="w-7 h-7 bg-blue-100 dark:bg-blue-900/50 text-blue-700 dark:text-blue-400 rounded-xl font-mono text-xs font-bold flex items-center justify-center shrink-0">
+                          {item.step}
+                        </span>
+                        <div>
+                          <p className="text-xs font-bold text-slate-900 dark:text-white">{item.title}</p>
+                          <p className="text-[11px] text-slate-500 dark:text-slate-400 mt-0.5 leading-relaxed">{item.desc}</p>
+                        </div>
+                      </div>
                     ))}
                   </div>
+                </div>
 
-                  {state === "error" && (
-                    <motion.p initial={{ opacity: 0 }} animate={{ opacity: 1 }}
-                      className="text-rose-500 text-sm text-center mb-4 font-semibold">
-                      PIN tidak valid atau sudah kedaluwarsa.
-                    </motion.p>
-                  )}
-
-                  <div className="space-y-3">
-                    <Button onClick={handleSubmitPin}
-                      disabled={state === "loading" || pin.join("").length !== 6}
-                      className="w-full h-12 bg-blue-600 hover:bg-blue-700 text-white font-bold rounded-xl shadow-md text-sm">
-                      {state === "loading"
-                        ? <><Loader2 className="w-4 h-4 mr-2 animate-spin" /> Memverifikasi PIN...</>
-                        : <>Verifikasi & Akses Rekam Medis <ChevronRight className="w-4 h-4 ml-1" /></>
-                      }
-                    </Button>
-
-                    <Button onClick={() => setShowQR(true)} variant="outline"
-                      disabled={state === "loading"}
-                      className="w-full h-12 border-blue-200 text-blue-700 hover:bg-blue-50 font-bold rounded-xl shadow-sm text-sm">
-                      <QrCode className="w-4 h-4 mr-2" /> Scan QR Code via Kamera
-                    </Button>
-                  </div>
-                </CardContent>
-              </Card>
-
-              {/* Break-Glass Button */}
-              <div className="mt-8 text-center">
-                <button onClick={() => setShowEmergency(true)} className="inline-flex items-center justify-center gap-2 px-4 py-2 text-rose-600 bg-rose-50 hover:bg-rose-100 rounded-full text-sm font-bold transition-colors">
-                  <TriangleAlert className="w-4 h-4" />
-                  Akses Darurat (Break-Glass)
-                </button>
               </div>
             </motion.div>
           )}

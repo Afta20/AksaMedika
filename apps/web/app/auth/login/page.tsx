@@ -124,7 +124,7 @@ function LoginForm() {
             <form onSubmit={handleLogin} className="space-y-5">
                 <div className="space-y-1.5">
                   <Label className="text-slate-700 dark:text-slate-300 font-bold transition-colors">Email</Label>
-                  <Input type="email" placeholder="nama@email.com" required value={email} onChange={(e) => setEmail(e.target.value)}
+                  <Input type="email" placeholder="nama@email.com" required value={email} onChange={(e) => setEmail(e.target.value)} autoComplete="email"
                     className="h-12 bg-slate-50 dark:bg-slate-900 border-slate-200 dark:border-slate-800 focus-visible:ring-blue-600 dark:text-white transition-colors" />
                 </div>
                 
@@ -134,7 +134,7 @@ function LoginForm() {
                     <a href="#" className="text-xs font-bold text-blue-600 dark:text-blue-400 hover:underline">Lupa password?</a>
                   </div>
                   <div className="relative">
-                    <Input type={showPass ? "text" : "password"} placeholder="••••••••" required value={password} onChange={(e) => setPassword(e.target.value)}
+                    <Input type={showPass ? "text" : "password"} placeholder="••••••••" required value={password} onChange={(e) => setPassword(e.target.value)} autoComplete="current-password"
                       className="h-12 bg-slate-50 dark:bg-slate-900 border-slate-200 dark:border-slate-800 focus-visible:ring-blue-600 pr-10 dark:text-white transition-colors" />
                     <button type="button" onClick={() => setShowPass(!showPass)} className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 dark:text-slate-500 hover:text-slate-600 dark:hover:text-slate-300">
                       {showPass ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
