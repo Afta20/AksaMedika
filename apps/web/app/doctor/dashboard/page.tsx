@@ -7,8 +7,9 @@ import {
   Shield, LogOut, Stethoscope, Users, Search, ChevronRight,
   Loader2, CheckCircle2, AlertCircle, FileText, Calendar, Pill,
   ClipboardList, Lock, Activity, Plus, X, User as UserIcon, Clock,
-  QrCode, Zap, Sparkles, TriangleAlert, Download, ShieldCheck
+  QrCode, Zap, Sparkles, TriangleAlert, Download, ShieldCheck, Moon, Sun
 } from "lucide-react";
+import { useTheme } from "next-themes";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
@@ -142,6 +143,24 @@ function DashboardContent() {
   const emergencyParam = searchParams?.get("emergency");
   const emergencyName = searchParams?.get("name");
   
+  const { setTheme, theme } = useTheme();
+  const [autoNightShift, setAutoNightShift] = useState(true);
+
+  // 🌙 Smart Auto Night Shift (18:00 - 06:00 WIB)
+  useEffect(() => {
+    if (autoNightShift) {
+      const hour = new Date().getHours();
+      if (hour >= 18 || hour < 6) {
+        if (theme !== "dark") {
+          setTheme("dark");
+          toast("🌙 Mode Jaga Malam Aktif", {
+            description: "Otomatis beralih ke Dark Mode (18:00 - 06:00) demi kenyamanan mata dokter saat piket malam.",
+          });
+        }
+      }
+    }
+  }, [autoNightShift, theme, setTheme]);
+
   // Doctor Data
   const [profile, setProfile] = useState<DoctorProfile | null>(null);
   const [stats, setStats] = useState<DoctorStats | null>(null);
@@ -522,12 +541,38 @@ function DashboardContent() {
                 : "Masukkan PIN 6-digit dari pasien atau Scan QR Code."}
             </p>
           </div>
-          {patient && (
-            <Button onClick={resetSession} variant="outline" size="sm"
-              className="text-slate-700 border-slate-200 hover:bg-slate-50 font-semibold shrink-0">
-              Sesi Baru
-            </Button>
-          )}
+          <div className="flex items-center gap-3 shrink-0">
+            <button
+              onClick={() => {
+                const next = !autoNightShift;
+                setAutoNightShift(next);
+                if (next) {
+                  const hour = new Date().getHours();
+                  if (hour >= 18 || hour < 6) setTheme("dark");
+                  toast.success("Mode Jaga Malam Otomatis diaktifkan (18:00 - 06:00)");
+                } else {
+                  toast("Mode Jaga Malam Otomatis dimatikan");
+                }
+              }}
+              className={`inline-flex items-center gap-2 px-3 py-1.5 rounded-full text-xs font-bold transition-all border cursor-pointer ${
+                autoNightShift
+                  ? "bg-indigo-50 dark:bg-indigo-950/60 text-indigo-700 dark:text-indigo-300 border-indigo-200 dark:border-indigo-800/80 shadow-sm"
+                  : "bg-slate-100 dark:bg-slate-800 text-slate-500 border-slate-200 dark:border-slate-700"
+              }`}
+              title="Otomatis beralih ke Dark Mode antara jam 18:00 - 06:00 demi kenyamanan mata dokter piket malam"
+            >
+              <Moon className="w-3.5 h-3.5 text-indigo-600 dark:text-indigo-400" />
+              <span className="hidden sm:inline">Jaga Malam: {autoNightShift ? "Auto (18-06)" : "Off"}</span>
+              <span className="sm:hidden">{autoNightShift ? "Auto" : "Off"}</span>
+            </button>
+
+            {patient && (
+              <Button onClick={resetSession} variant="outline" size="sm"
+                className="text-slate-700 dark:text-slate-200 border-slate-200 dark:border-slate-800 hover:bg-slate-50 dark:hover:bg-slate-800 font-semibold shrink-0">
+                Sesi Baru
+              </Button>
+            )}
+          </div>
         </div>
 
         <AnimatePresence mode="wait">
