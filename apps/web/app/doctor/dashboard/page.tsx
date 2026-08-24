@@ -558,7 +558,7 @@ function DashboardContent() {
                     {pin.map((digit, i) => (
                       <input key={i}
                         ref={(el) => inputRefs(el, i)}
-                        type="text" inputMode="numeric" maxLength={1} value={digit}
+                        type="password" inputMode="numeric" maxLength={1} value={digit}
                         onChange={(e) => handlePinChange(e.target.value, i)}
                         onKeyDown={(e) => handlePinKeyDown(e, i)}
                         disabled={state === "loading"}

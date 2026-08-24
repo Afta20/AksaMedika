@@ -52,7 +52,7 @@ func (h *Handler) ListPatientRecords(c *gin.Context) {
 	patientID := c.GetString("user_id")
 
 	rows, err := h.db.Query(context.Background(),
-		`SELECT id, visit_date, diagnosis, created_at, COALESCE(data_integrity_hash, '')
+		`SELECT id, visit_date::text, diagnosis, created_at::text, COALESCE(data_integrity_hash, '')
 		 FROM medical_records
 		 WHERE patient_id = $1
 		 ORDER BY visit_date DESC`,

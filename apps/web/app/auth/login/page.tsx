@@ -156,10 +156,24 @@ function LoginForm() {
             <AnimatePresence>
               <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }}
                 className="mt-6 p-4 bg-blue-50 dark:bg-blue-950/20 border border-blue-100 dark:border-blue-900/50 rounded-xl">
-                <p className="text-blue-700 dark:text-blue-400 text-xs font-bold mb-2">🧪 Demo Credentials</p>
-                <div className="space-y-1 text-xs text-slate-600 dark:text-slate-400">
-                  <p><span className="font-semibold text-slate-800 dark:text-slate-200">Pasien:</span> budi.santoso@demo.com / password123</p>
-                  <p><span className="font-semibold text-slate-800 dark:text-slate-200">Dokter:</span> dr.andi@demo.com / password123</p>
+                <p className="text-blue-700 dark:text-blue-400 text-xs font-bold mb-2">🧪 Demo Credentials (Klik untuk Isi Otomatis)</p>
+                <div className="space-y-2 text-xs">
+                  <button type="button" onClick={() => { setRole("patient"); setEmail("budi.santoso@demo.com"); setPassword("password123"); }}
+                    className="w-full text-left p-2 rounded-lg bg-white dark:bg-slate-900 border border-blue-100 dark:border-slate-800 hover:border-blue-400 transition-colors flex justify-between items-center group">
+                    <div>
+                      <span className="font-bold text-slate-800 dark:text-slate-200">Pasien: </span>
+                      <span className="text-slate-500">budi.santoso@demo.com</span>
+                    </div>
+                    <span className="text-[10px] font-bold text-blue-600 dark:text-blue-400 opacity-0 group-hover:opacity-100 transition-opacity">Isi →</span>
+                  </button>
+                  <button type="button" onClick={() => { setRole("doctor"); setEmail("dr.andi@demo.com"); setPassword("password123"); }}
+                    className="w-full text-left p-2 rounded-lg bg-white dark:bg-slate-900 border border-blue-100 dark:border-slate-800 hover:border-blue-400 transition-colors flex justify-between items-center group">
+                    <div>
+                      <span className="font-bold text-slate-800 dark:text-slate-200">Dokter: </span>
+                      <span className="text-slate-500">dr.andi@demo.com</span>
+                    </div>
+                    <span className="text-[10px] font-bold text-blue-600 dark:text-blue-400 opacity-0 group-hover:opacity-100 transition-opacity">Isi →</span>
+                  </button>
                 </div>
               </motion.div>
             </AnimatePresence>
