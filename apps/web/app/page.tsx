@@ -207,13 +207,13 @@ export default function LandingPage() {
             {/* Right: Illustration */}
             <motion.div variants={fadeIn} initial="hidden" animate="visible"
               className="relative flex justify-center items-center">
-              <div className="absolute inset-0 bg-gradient-to-br from-blue-100/40 to-emerald-100/30 rounded-3xl blur-2xl" />
-              <div className="relative w-full aspect-square max-w-lg">
+              <div className="absolute inset-0 bg-gradient-to-br from-blue-100/50 to-emerald-100/40 dark:from-blue-900/30 dark:to-emerald-900/20 rounded-3xl blur-2xl" />
+              <div className="relative w-full aspect-square max-w-lg bg-white dark:bg-slate-900/90 rounded-3xl p-4 border border-slate-200/80 dark:border-slate-800 shadow-xl shadow-slate-200/50 dark:shadow-none overflow-hidden transition-all duration-300">
                 <Image
                   src="/hero-illustration.png"
                   alt="Doctor and patient healthcare illustration"
                   fill
-                  className="object-contain drop-shadow-xl"
+                  className="object-contain p-2"
                   priority
                 />
               </div>
