@@ -3,7 +3,10 @@
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { motion } from "framer-motion";
-import { TriangleAlert, ShieldAlert, LogIn, Loader2, ArrowLeft, ShieldCheck, Lock, Sparkles } from "lucide-react";
+import {
+  TriangleAlert, ShieldAlert, LogIn, Loader2, ArrowLeft,
+  ShieldCheck, Stethoscope, KeyRound
+} from "lucide-react";
 import { kioskEmergencyAccess } from "@/lib/api";
 import Link from "next/link";
 import { toast } from "sonner";
@@ -23,29 +26,34 @@ export default function KioskPage() {
       setError("NIK Pasien harus persis 16 digit angka.");
       return;
     }
-    
+
     setLoading(true);
     setError("");
     try {
       const res = await kioskEmergencyAccess({
         nik,
         doctor_email: email,
-        doctor_password: password
+        doctor_password: password,
       });
-      
-      // Save temporary kiosk session token
+
       localStorage.setItem("cg_token", res.token);
-      localStorage.setItem("cg_user", JSON.stringify({
-        id: res.doctor_id || "ER-KIOSK",
-        name: res.doctor_name || "Doctor Kiosk",
-        role: "doctor",
-        is_kiosk: true
-      }));
-      
+      localStorage.setItem(
+        "cg_user",
+        JSON.stringify({
+          id: res.doctor_id || "ER-KIOSK",
+          name: res.doctor_name || "Doctor Kiosk",
+          role: "doctor",
+          is_kiosk: true,
+        })
+      );
+
       toast.success(res.message);
-      router.push(`/doctor/dashboard?emergency=${res.patient_id}&name=${encodeURIComponent(res.patient_name)}&nik=${nik}`);
+      router.push(
+        `/doctor/dashboard?emergency=${res.patient_id}&name=${encodeURIComponent(res.patient_name)}&nik=${nik}`
+      );
     } catch (err: unknown) {
-      const message = err instanceof Error ? err.message : "Akses Darurat Ditolak.";
+      const message =
+        err instanceof Error ? err.message : "Akses Darurat Ditolak.";
       setError(message);
     } finally {
       setLoading(false);
@@ -57,152 +65,194 @@ export default function KioskPage() {
     setEmail("dr.andi@demo.com");
     setPassword("password123");
     setError("");
-    toast.success("Kredensial Kiosk UGD diisi!");
+    toast.success("Data demo kiosk berhasil diisi.");
   };
 
   return (
-    <div className="min-h-screen bg-slate-950 text-slate-100 flex flex-col justify-between p-4 sm:p-6 md:p-8 relative overflow-hidden" style={{ fontFamily: "'Inter', system-ui, sans-serif" }}>
+    <div className="min-h-screen bg-slate-50 dark:bg-slate-950 text-slate-900 dark:text-slate-100 transition-colors duration-300">
       
-      {/* Dynamic Glowing Orbs Background */}
-      <div className="absolute top-0 left-1/2 -translate-x-1/2 w-[1000px] h-[500px] bg-rose-600/10 rounded-full blur-[120px] pointer-events-none" />
-      <div className="absolute bottom-0 right-0 w-[500px] h-[500px] bg-blue-600/10 rounded-full blur-[120px] pointer-events-none" />
+      {/* Topbar */}
+      <header className="border-b border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 transition-colors">
+        <div className="max-w-5xl mx-auto px-4 sm:px-6 h-14 flex items-center justify-between">
+          <Link
+            href="/"
+            className="flex items-center gap-2 text-slate-500 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white transition-colors text-sm font-medium"
+          >
+            <ArrowLeft className="w-4 h-4" />
+            Kembali ke Beranda
+          </Link>
 
-      {/* Top Header Navigation */}
-      <header className="relative z-20 flex items-center justify-between max-w-5xl mx-auto w-full">
-        <Link href="/" className="flex items-center gap-2.5 text-slate-400 hover:text-white transition-colors group">
-          <div className="w-9 h-9 bg-slate-900 border border-slate-800 rounded-xl flex items-center justify-center group-hover:border-slate-700 transition-colors">
-            <ArrowLeft className="w-4 h-4 text-slate-300" />
+          <div className="flex items-center gap-3">
+            {/* Live Status Badge */}
+            <div className="hidden sm:flex items-center gap-1.5 text-xs font-semibold text-rose-600 dark:text-rose-400 bg-rose-50 dark:bg-rose-950/60 border border-rose-200 dark:border-rose-900/60 px-3 py-1.5 rounded-full">
+              <span className="relative flex h-2 w-2">
+                <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-rose-400 opacity-75" />
+                <span className="relative inline-flex rounded-full h-2 w-2 bg-rose-500" />
+              </span>
+              Terminal Gawat Darurat
+            </div>
+            <ThemeToggle />
           </div>
-          <span className="text-sm font-semibold hidden sm:inline">Kembali ke Beranda</span>
-        </Link>
-
-        <div className="flex items-center gap-3">
-          <div className="flex items-center gap-2 px-3 py-1.5 rounded-full bg-rose-950/60 border border-rose-900/60 text-rose-400 text-xs font-bold shadow-sm">
-            <span className="w-2 h-2 rounded-full bg-rose-500 animate-ping" />
-            UGD / Kios Terminal Gawat Darurat
-          </div>
-          <ThemeToggle />
         </div>
       </header>
 
-      {/* Main Content Card */}
-      <main className="relative z-10 w-full max-w-xl mx-auto my-auto py-8">
-        <motion.div 
-          initial={{ opacity: 0, y: 20 }}
+      {/* Main */}
+      <main className="max-w-lg mx-auto px-4 sm:px-6 py-12 sm:py-16">
+        
+        {/* Page Identity */}
+        <motion.div
+          initial={{ opacity: 0, y: 12 }}
           animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.4 }}
-          className="bg-slate-900/90 backdrop-blur-2xl border border-slate-800 rounded-3xl overflow-hidden shadow-2xl shadow-rose-950/40"
+          transition={{ duration: 0.35 }}
+          className="text-center mb-8"
         >
-          {/* Header Banner */}
-          <div className="bg-gradient-to-r from-rose-900/80 via-rose-900 to-rose-950 p-6 sm:p-8 text-center text-white border-b border-rose-900/50 relative overflow-hidden">
-            <div className="absolute -top-12 -right-12 w-32 h-32 bg-white/5 rounded-full blur-xl" />
-            
-            <div className="w-16 h-16 bg-white/10 backdrop-blur-md rounded-2xl mx-auto flex items-center justify-center mb-4 border border-white/20 shadow-lg shadow-rose-950/50">
-              <TriangleAlert className="w-8 h-8 text-rose-400" />
-            </div>
-            
-            <h1 className="text-2xl sm:text-3xl font-extrabold tracking-tight">MODE GAWAT DARURAT (IGD)</h1>
-            <p className="text-rose-200 text-xs sm:text-sm font-medium mt-1">Fasilitas Akses Paksa Rekam Medis Pasien (Break-Glass Protocol)</p>
+          <div className="inline-flex items-center justify-center w-14 h-14 bg-rose-100 dark:bg-rose-950/60 border border-rose-200 dark:border-rose-900 rounded-2xl mb-4">
+            <TriangleAlert className="w-7 h-7 text-rose-600 dark:text-rose-400" />
+          </div>
+          <h1 className="text-2xl font-extrabold text-slate-900 dark:text-white tracking-tight">
+            Akses Darurat IGD
+          </h1>
+          <p className="text-slate-500 dark:text-slate-400 text-sm mt-1.5 max-w-xs mx-auto leading-relaxed">
+            Break-Glass Protocol — digunakan saat pasien tidak dapat memberikan consent secara langsung.
+          </p>
+        </motion.div>
+
+        {/* Form Card */}
+        <motion.div
+          initial={{ opacity: 0, y: 16 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.4, delay: 0.05 }}
+          className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl shadow-sm overflow-hidden transition-colors"
+        >
+          
+          {/* Warning Strip */}
+          <div className="px-5 py-3.5 bg-amber-50 dark:bg-amber-950/30 border-b border-amber-200 dark:border-amber-900/50 flex items-start gap-2.5">
+            <ShieldAlert className="w-4 h-4 text-amber-600 dark:text-amber-400 shrink-0 mt-px" />
+            <p className="text-xs text-amber-800 dark:text-amber-300 leading-relaxed">
+              Akses ini memicu <strong>Audit Trail permanen</strong>. Identitas dokter dan NIK pasien wajib diisi. Penyalahgunaan dapat dikenai sanksi.
+            </p>
           </div>
 
-          <div className="p-6 sm:p-8 space-y-6">
-            
-            {/* Security Warning Notice */}
-            <div className="bg-rose-950/30 border border-rose-900/50 rounded-2xl p-4 flex items-start gap-3.5">
-              <ShieldAlert className="w-5 h-5 text-rose-400 shrink-0 mt-0.5" />
-              <p className="text-xs text-rose-200/90 leading-relaxed font-medium">
-                Penggunaan Kiosk ini akan mentrigger <strong className="text-white font-bold">Audit Trail Tertinggi</strong>. Otorisasi ganda menggunakan NIK Pasien dan Kredensial Dokter diwajibkan. Log dicatat permanen secara immutable.
-              </p>
-            </div>
-
-            {/* Form */}
-            <form onSubmit={handleAccess} className="space-y-5">
+          <div className="p-5 sm:p-6 space-y-5">
+            <form onSubmit={handleAccess} className="space-y-4">
               
+              {/* NIK Field */}
               <div>
-                <label className="block text-xs font-bold text-slate-300 uppercase tracking-wider mb-2 flex justify-between">
-                  <span>NIK Pasien Target (16 Digit)</span>
-                  <span className="text-slate-500 font-mono">{nik.length}/16</span>
-                </label>
+                <div className="flex items-center justify-between mb-1.5">
+                  <label className="text-xs font-bold text-slate-700 dark:text-slate-300 uppercase tracking-wide">
+                    NIK Pasien
+                  </label>
+                  <span className="text-xs text-slate-400 dark:text-slate-500 font-mono">
+                    {nik.length} / 16
+                  </span>
+                </div>
                 <input
                   type="text"
+                  inputMode="numeric"
                   value={nik}
-                  onChange={(e) => setNik(e.target.value.replace(/\D/g, '').slice(0, 16))}
-                  placeholder="3171012345670001"
+                  onChange={(e) =>
+                    setNik(e.target.value.replace(/\D/g, "").slice(0, 16))
+                  }
+                  placeholder="Nomor Induk Kependudukan (16 digit)"
                   autoComplete="off"
-                  className="w-full bg-slate-950 border border-slate-800 px-4 py-3.5 rounded-xl text-white focus:ring-2 focus:ring-rose-500 focus:border-rose-500 outline-none transition-all font-mono tracking-widest text-lg placeholder:text-slate-700"
+                  className="w-full bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 text-slate-900 dark:text-white px-3.5 py-3 rounded-xl font-mono tracking-widest text-sm placeholder:text-slate-400 dark:placeholder:text-slate-600 focus:outline-none focus:ring-2 focus:ring-rose-500 focus:border-transparent transition-all"
                 />
               </div>
 
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                <div>
-                  <label className="block text-xs font-bold text-slate-300 uppercase tracking-wider mb-2">Email Dokter IGD</label>
-                  <input
-                    type="email"
-                    value={email}
-                    onChange={(e) => setEmail(e.target.value)}
-                    placeholder="dr.andi@demo.com"
-                    autoComplete="email"
-                    className="w-full bg-slate-950 border border-slate-800 px-4 py-3 rounded-xl text-white focus:ring-2 focus:ring-rose-500 outline-none transition-all placeholder:text-slate-700 text-sm"
-                  />
+              {/* Doctor Credentials */}
+              <div className="space-y-3">
+                <div className="flex items-center gap-1.5 mb-0.5">
+                  <Stethoscope className="w-3.5 h-3.5 text-slate-400" />
+                  <span className="text-xs font-bold text-slate-700 dark:text-slate-300 uppercase tracking-wide">
+                    Verifikasi Identitas Dokter
+                  </span>
                 </div>
-                <div>
-                  <label className="block text-xs font-bold text-slate-300 uppercase tracking-wider mb-2">Password Dokter</label>
+                <input
+                  type="email"
+                  value={email}
+                  onChange={(e) => setEmail(e.target.value)}
+                  placeholder="Email terdaftar dokter"
+                  autoComplete="email"
+                  className="w-full bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 text-slate-900 dark:text-white px-3.5 py-3 rounded-xl text-sm placeholder:text-slate-400 dark:placeholder:text-slate-600 focus:outline-none focus:ring-2 focus:ring-rose-500 focus:border-transparent transition-all"
+                />
+                <div className="relative">
+                  <KeyRound className="w-4 h-4 text-slate-400 dark:text-slate-500 absolute left-3.5 top-1/2 -translate-y-1/2" />
                   <input
                     type="password"
                     value={password}
                     onChange={(e) => setPassword(e.target.value)}
-                    placeholder="••••••••"
+                    placeholder="Password"
                     autoComplete="current-password"
-                    className="w-full bg-slate-950 border border-slate-800 px-4 py-3 rounded-xl text-white focus:ring-2 focus:ring-rose-500 outline-none transition-all placeholder:text-slate-700 text-sm"
+                    className="w-full bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 text-slate-900 dark:text-white pl-10 pr-3.5 py-3 rounded-xl text-sm placeholder:text-slate-400 dark:placeholder:text-slate-600 focus:outline-none focus:ring-2 focus:ring-rose-500 focus:border-transparent transition-all"
                   />
                 </div>
               </div>
 
+              {/* Error */}
               {error && (
-                <div className="p-3 rounded-xl bg-rose-950/60 border border-rose-800 text-rose-400 text-xs font-semibold text-center">
-                  ⚠️ {error}
+                <div className="flex items-center gap-2 p-3 bg-rose-50 dark:bg-rose-950/40 border border-rose-200 dark:border-rose-800 text-rose-700 dark:text-rose-400 rounded-xl text-xs font-semibold">
+                  <TriangleAlert className="w-4 h-4 shrink-0" />
+                  {error}
                 </div>
               )}
 
+              {/* Submit */}
               <button
                 type="submit"
                 disabled={loading || nik.length !== 16 || !email || !password}
-                className="w-full py-4 bg-gradient-to-r from-rose-600 to-rose-700 hover:from-rose-500 hover:to-rose-600 disabled:opacity-50 text-white font-extrabold rounded-xl shadow-xl shadow-rose-900/30 transition-all flex items-center justify-center gap-2 text-sm uppercase tracking-wide cursor-pointer"
+                className="w-full mt-1 py-3.5 bg-rose-600 hover:bg-rose-700 disabled:opacity-40 disabled:cursor-not-allowed text-white font-bold rounded-xl text-sm flex items-center justify-center gap-2 transition-colors shadow-sm cursor-pointer"
               >
                 {loading ? (
-                  <Loader2 className="w-5 h-5 animate-spin" />
+                  <>
+                    <Loader2 className="w-4 h-4 animate-spin" />
+                    Memverifikasi...
+                  </>
                 ) : (
-                  <><LogIn className="w-5 h-5" /> BUKA REKAM MEDIS SEKARANG</>
+                  <>
+                    <LogIn className="w-4 h-4" />
+                    Buka Rekam Medis Darurat
+                  </>
                 )}
               </button>
             </form>
 
-            {/* Quick Demo Autofill Helper */}
-            <div className="pt-2 border-t border-slate-800/80">
+            {/* Demo Autofill */}
+            <div className="pt-4 border-t border-slate-100 dark:border-slate-800">
               <button
                 type="button"
                 onClick={handleAutoFill}
-                className="w-full py-2.5 px-4 rounded-xl bg-slate-950 hover:bg-slate-800 border border-slate-800 text-slate-400 hover:text-slate-200 text-xs font-bold transition-all flex items-center justify-between group"
+                className="w-full text-xs text-slate-500 dark:text-slate-400 hover:text-slate-700 dark:hover:text-slate-200 font-medium py-2.5 px-3 rounded-lg hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors text-left flex items-center justify-between"
               >
-                <span className="flex items-center gap-2">
-                  <Sparkles className="w-3.5 h-3.5 text-rose-400" />
-                  🧪 Demo Credentials Kiosk (Pasien Budi + Dr. Andi)
-                </span>
-                <span className="text-[10px] text-rose-400 group-hover:translate-x-1 transition-transform">Isi →</span>
+                <span>🧪 Isi Data Demo (Budi + Dr. Andi)</span>
+                <span className="text-slate-400 dark:text-slate-500">Isi →</span>
               </button>
             </div>
+          </div>
+        </motion.div>
 
+        {/* Trust Indicators */}
+        <motion.div
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          transition={{ duration: 0.4, delay: 0.15 }}
+          className="mt-6 flex items-center justify-center gap-5 text-slate-400 dark:text-slate-500"
+        >
+          <div className="flex items-center gap-1.5 text-xs font-medium">
+            <ShieldCheck className="w-3.5 h-3.5" />
+            Zero-Trust
+          </div>
+          <span className="w-px h-3 bg-slate-300 dark:bg-slate-700" />
+          <div className="flex items-center gap-1.5 text-xs font-medium">
+            <ShieldCheck className="w-3.5 h-3.5" />
+            SHA-256 Audit Trail
+          </div>
+          <span className="w-px h-3 bg-slate-300 dark:bg-slate-700" />
+          <div className="flex items-center gap-1.5 text-xs font-medium">
+            <ShieldCheck className="w-3.5 h-3.5" />
+            Immutable Log
           </div>
         </motion.div>
       </main>
-
-      {/* Footer Security Badge */}
-      <footer className="relative z-20 text-center py-4">
-        <p className="text-slate-500 text-xs font-medium flex items-center justify-center gap-2">
-          <ShieldCheck className="w-4 h-4 text-rose-500" />
-          Kiosk Terminal dilindungi oleh Aksamedika Zero-Trust Protocol & SHA-256 Audit Trail
-        </p>
-      </footer>
     </div>
   );
 }
