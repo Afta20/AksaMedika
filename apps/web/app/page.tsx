@@ -8,7 +8,7 @@ import {
   Zap, Database, Menu, X, Hospital
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import type { Variants } from "framer-motion";
 import { ThemeToggle } from "@/components/ThemeToggle";
 
@@ -27,6 +27,13 @@ const fadeIn: Variants = {
 
 export default function LandingPage() {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+  const [scrollY, setScrollY] = useState(0);
+
+  useEffect(() => {
+    const handleScroll = () => setScrollY(window.scrollY);
+    window.addEventListener("scroll", handleScroll, { passive: true });
+    return () => window.removeEventListener("scroll", handleScroll);
+  }, []);
 
   return (
     <div className="min-h-screen bg-background text-foreground transition-colors duration-300" style={{ fontFamily: "'Inter', system-ui, sans-serif" }}>
@@ -117,8 +124,29 @@ export default function LandingPage() {
       </nav>
 
       {/* ===== HERO ===== */}
-      <section className="pt-24 pb-16 md:pt-32 md:pb-24 px-6 bg-gradient-to-b from-blue-50/70 via-white to-white dark:from-blue-900/20 dark:via-background dark:to-background overflow-hidden transition-colors duration-300">
-        <div className="max-w-7xl mx-auto">
+      <section className="pt-24 pb-16 md:pt-32 md:pb-24 px-6 bg-gradient-to-b from-blue-50/70 via-white to-white dark:from-blue-900/20 dark:via-background dark:to-background overflow-hidden transition-colors duration-300 relative">
+        {/* Parallax background layers */}
+        <div
+          aria-hidden="true"
+          className="pointer-events-none absolute inset-0 overflow-hidden"
+        >
+          {/* Slow blob — top-right */}
+          <div
+            className="absolute -top-24 -right-24 w-[520px] h-[520px] rounded-full bg-blue-100/60 dark:bg-blue-900/20 blur-3xl"
+            style={{ transform: `translateY(${scrollY * 0.18}px)` }}
+          />
+          {/* Medium blob — bottom-left */}
+          <div
+            className="absolute -bottom-16 -left-16 w-[380px] h-[380px] rounded-full bg-indigo-100/40 dark:bg-indigo-900/10 blur-2xl"
+            style={{ transform: `translateY(${scrollY * -0.12}px)` }}
+          />
+          {/* Small accent — centre */}
+          <div
+            className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[240px] h-[240px] rounded-full bg-emerald-100/30 dark:bg-emerald-900/10 blur-2xl"
+            style={{ transform: `translateX(-50%) translateY(calc(-50% + ${scrollY * 0.08}px))` }}
+          />
+        </div>
+        <div className="max-w-7xl mx-auto relative z-10">
           <div className="grid md:grid-cols-2 gap-12 items-center">
             {/* Left: Text */}
             <div>
@@ -405,10 +433,22 @@ export default function LandingPage() {
 
       {/* ===== CTA ===== */}
       <section className="py-20 px-6 bg-blue-600 relative overflow-hidden">
-        <div className="absolute inset-0 opacity-10"
+        {/* static decorative circles */}
+        <div className="absolute inset-0 opacity-10 pointer-events-none"
           style={{
             backgroundImage: `radial-gradient(circle at 20% 50%, white 0%, transparent 50%), radial-gradient(circle at 80% 20%, white 0%, transparent 40%)`,
           }}
+        />
+        {/* Parallax accent blobs */}
+        <div
+          aria-hidden="true"
+          className="pointer-events-none absolute -top-24 -left-24 w-64 h-64 rounded-full bg-white/10 blur-2xl"
+          style={{ transform: `translateY(${scrollY * 0.06}px)` }}
+        />
+        <div
+          aria-hidden="true"
+          className="pointer-events-none absolute -bottom-20 right-0 w-80 h-80 rounded-full bg-white/5 blur-2xl"
+          style={{ transform: `translateY(${scrollY * -0.04}px)` }}
         />
         <div className="max-w-2xl mx-auto text-center relative z-10">
           <h2 className="text-3xl md:text-4xl font-extrabold text-white mb-4">
