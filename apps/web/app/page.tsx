@@ -240,7 +240,7 @@ export default function LandingPage() {
       </section>
 
       {/* ===== PROBLEM (Alternating) ===== */}
-      <section id="tentang" className="py-24 px-6 bg-background transition-colors duration-300">
+      <section id="tentang" className="py-24 px-6 bg-white dark:bg-slate-950 transition-colors duration-300">
         <div className="max-w-6xl mx-auto">
           <motion.div initial={{ opacity: 0, y: 20 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} className="text-center mb-20">
             <p className="text-blue-600 dark:text-blue-400 text-sm font-bold uppercase tracking-widest mb-3">Kenyataan Saat Ini</p>
@@ -383,7 +383,7 @@ export default function LandingPage() {
       </section>
 
       {/* ===== HOW IT WORKS ===== */}
-      <section id="cara-kerja" className="py-24 px-6 bg-background transition-colors duration-300">
+      <section id="cara-kerja" className="py-24 px-6 bg-stone-50 dark:bg-slate-900/40 transition-colors duration-300">
         <div className="max-w-5xl mx-auto">
           <motion.div initial={{ opacity: 0, y: 20 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} className="text-center mb-16">
             <p className="text-blue-600 dark:text-blue-400 text-sm font-bold uppercase tracking-widest mb-3">Cara Kerja</p>
