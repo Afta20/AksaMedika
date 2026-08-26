@@ -102,6 +102,9 @@ export const doctorApi = {
       body: JSON.stringify({ patient_id: patientId }),
     }, token),
 
+  checkSessionStatus: (patientId: string, token: string) =>
+    apiFetch<{ valid: boolean; reason?: string }>(`/api/doctor/session-status/${patientId}`, {}, token),
+
   getPatientRecords: (patientId: string, token: string) =>
     apiFetch<RecordsResponse>(`/api/doctor/records/${patientId}`, {}, token),
 

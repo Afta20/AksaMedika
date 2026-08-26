@@ -98,6 +98,7 @@ func init() {
 				doctor.POST("/access", consentHandler.ValidateAccess)
 				doctor.POST("/emergency-access", consentHandler.EmergencyAccess)
 				doctor.POST("/revoke-access", consentHandler.DoctorRevokeAccess)
+				doctor.GET("/session-status/:patient_id", consentHandler.CheckSessionStatus)
 				doctor.GET("/records/:patient_id", recordsHandler.GetPatientRecordsForDoctor)
 				doctor.POST("/records/:patient_id", recordsHandler.CreateRecord)
 				doctor.GET("/records/:patient_id/summary", recordsHandler.GetPatientSummaryAI)

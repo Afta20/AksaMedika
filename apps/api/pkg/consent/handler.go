@@ -335,3 +335,43 @@ func (h *Handler) DoctorRevokeAccess(c *gin.Context) {
 
 	c.JSON(http.StatusOK, gin.H{"message": "Sesi pemeriksaan berhasil diakhiri oleh dokter"})
 }
+
+// CheckSessionStatus checks if a doctor's active session with a patient is valid or revoked.
+// GET /api/doctor/session-status/:patient_id
+func (h *Handler) CheckSessionStatus(c *gin.Context) {
+	patientID := c.Param("patient_id")
+
+	var (
+		accessMethod string
+		accessedAt   time.Time
+	)
+
+	err := h.db.QueryRow(context.Background(),
+		`SELECT access_method, accessed_at 
+		 FROM audit_logs 
+		 WHERE patient_id = $1 
+		 ORDER BY accessed_at DESC 
+		 LIMIT 1`,
+		patientID,
+	).Scan(&accessMethod, &accessedAt)
+
+	if err != nil || accessMethod == "REVOKED" {
+		c.JSON(http.StatusOK, gin.H{
+			"valid":  false,
+			"reason": "Izin akses telah dicabut oleh pasien",
+		})
+		return
+	}
+
+	if time.Since(accessedAt) > 30*time.Minute {
+		c.JSON(http.StatusOK, gin.H{
+			"valid":  false,
+			"reason": "Sesi pemeriksaan 30 menit telah habis",
+		})
+		return
+	}
+
+	c.JSON(http.StatusOK, gin.H{
+		"valid": true,
+	})
+}

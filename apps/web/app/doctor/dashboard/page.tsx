@@ -455,8 +455,33 @@ function DashboardContent() {
     }
   };
 
-  const resetSession = () => {
-    if (patient) {
+  // Real-time Revocation Watchdog for active patient session
+  useEffect(() => {
+    if (!patient) return;
+
+    const checkSession = async () => {
+      const token = localStorage.getItem("cg_token");
+      if (!token) return;
+
+      try {
+        const res = await doctorApi.checkSessionStatus(patient.patient_id, token);
+        if (!res.valid) {
+          toast.error(res.reason || "Sesi terputus: Izin akses telah dicabut oleh pasien.", {
+            duration: 5000,
+          });
+          resetSession(false);
+        }
+      } catch {
+        // network glitch ignore
+      }
+    };
+
+    const interval = setInterval(checkSession, 3000);
+    return () => clearInterval(interval);
+  }, [patient]);
+
+  const resetSession = (notifyServer = true) => {
+    if (patient && notifyServer) {
       const token = localStorage.getItem("cg_token");
       if (token) {
         doctorApi.revokeAccess(patient.patient_id, token).catch(() => {});
@@ -635,7 +660,7 @@ function DashboardContent() {
             </button>
 
             {patient && (
-              <Button onClick={resetSession} variant="outline" size="sm"
+              <Button onClick={() => resetSession()} variant="outline" size="sm"
                 className="text-slate-700 dark:text-slate-200 border-slate-200 dark:border-slate-800 hover:bg-slate-50 dark:hover:bg-slate-800 font-semibold shrink-0">
                 Sesi Baru
               </Button>
