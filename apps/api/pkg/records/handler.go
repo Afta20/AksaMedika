@@ -72,12 +72,14 @@ func (h *Handler) ListPatientRecords(c *gin.Context) {
 	var records []MaskedRecord
 	for rows.Next() {
 		var r MaskedRecord
-		var diag, hash string
-		if err := rows.Scan(&r.ID, &r.VisitDate, &diag, &r.Prescription, &r.Notes, &r.DoctorName, &r.ICDCode, &r.CreatedAt, &hash); err != nil {
+		var diag, pres, notes, hash string
+		if err := rows.Scan(&r.ID, &r.VisitDate, &diag, &pres, &notes, &r.DoctorName, &r.ICDCode, &r.CreatedAt, &hash); err != nil {
 			continue
 		}
 		
 		decryptedDiag, _ := crypto.Decrypt(diag)
+		decryptedPres, _ := crypto.Decrypt(pres)
+		decryptedNotes, _ := crypto.Decrypt(notes)
 		
 		if hash != "" {
 			computedHash := crypto.GenerateDataHash(patientID, decryptedDiag, r.VisitDate)
@@ -89,6 +91,8 @@ func (h *Handler) ListPatientRecords(c *gin.Context) {
 		}
 
 		r.Diagnosis = decryptedDiag
+		r.Prescription = decryptedPres
+		r.Notes = decryptedNotes
 		records = append(records, r)
 	}
 

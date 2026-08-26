@@ -453,61 +453,63 @@ export default function PatientDashboard() {
                       <p className="text-slate-500 dark:text-slate-400 text-sm font-medium transition-colors">Belum ada riwayat medis</p>
                     </div>
                   ) : (
-                    <div className="relative pl-3 border-l-2 border-slate-100 dark:border-slate-800 space-y-6 py-2 transition-colors max-h-[500px] overflow-y-auto pr-1">
-                      {records.map((r, i) => (
-                        <div key={r.id} className="relative">
-                          {/* Timeline dot */}
-                          <div className="absolute -left-[17px] top-1.5 w-3 h-3 bg-white dark:bg-slate-900 border-2 border-blue-500 rounded-full transition-colors" />
-                          
-                          <div className="pl-4">
-                            <div className="flex items-center justify-between gap-2 mb-1">
-                              <span className="text-xs font-bold text-blue-600 dark:text-blue-400 block transition-colors">
-                                {new Date(r.visit_date).toLocaleDateString("id-ID", { day: "numeric", month: "short", year: "numeric" })}
-                              </span>
-                              {r.doctor_name && (
-                                <span className="text-[10px] text-slate-400 dark:text-slate-500 font-medium">
-                                  {r.doctor_name}
+                    <div className="max-h-[500px] overflow-y-auto pr-2 pl-3 py-1 space-y-6">
+                      <div className="relative border-l-2 border-slate-100 dark:border-slate-800 space-y-6 pl-4">
+                        {records.map((r) => (
+                          <div key={r.id} className="relative">
+                            {/* Timeline dot */}
+                            <div className="absolute -left-[23px] top-1.5 w-3 h-3 bg-white dark:bg-slate-900 border-2 border-blue-500 rounded-full z-10" />
+                            
+                            <div>
+                              <div className="flex items-center justify-between gap-2 mb-1.5">
+                                <span className="text-xs font-bold text-blue-600 dark:text-blue-400 block">
+                                  {new Date(r.visit_date).toLocaleDateString("id-ID", { day: "numeric", month: "short", year: "numeric" })}
                                 </span>
-                              )}
-                            </div>
+                                {r.doctor_name && (
+                                  <span className="text-[10px] text-slate-400 dark:text-slate-500 font-medium">
+                                    {r.doctor_name}
+                                  </span>
+                                )}
+                              </div>
 
-                            <div 
-                              onClick={() => setSelectedRecord(r)}
-                              className="bg-slate-50 dark:bg-slate-950 border border-slate-100 dark:border-slate-800 rounded-xl p-3.5 hover:border-blue-300 dark:hover:border-blue-700 hover:shadow-md cursor-pointer transition-all space-y-2 group"
-                            >
-                              {r.diagnosis.startsWith("[REVISI]") ? (
-                                <div className="space-y-1">
-                                  <Badge className="bg-amber-100 dark:bg-amber-950/60 text-amber-800 dark:text-amber-300 border border-amber-300 dark:border-amber-800/60 text-[10px] font-bold shadow-none inline-flex items-center gap-1">
-                                    <RotateCcw className="w-2.5 h-2.5 text-amber-600 dark:text-amber-400" /> Koreksi / Revisi
-                                  </Badge>
-                                  <p className="text-sm font-bold text-slate-900 dark:text-slate-200 group-hover:text-blue-600 dark:group-hover:text-blue-400 transition-colors">{r.diagnosis.replace(/^\[REVISI\]\s*/, "")}</p>
-                                </div>
-                              ) : r.diagnosis.startsWith("[ADDENDUM]") ? (
-                                <div className="space-y-1">
-                                  <Badge className="bg-purple-100 dark:bg-purple-950/60 text-purple-800 dark:text-purple-300 border border-purple-300 dark:border-purple-800/60 text-[10px] font-bold shadow-none inline-flex items-center gap-1">
-                                    <PlusCircle className="w-2.5 h-2.5 text-purple-600 dark:text-purple-400" /> Addendum
-                                  </Badge>
-                                  <p className="text-sm font-bold text-slate-900 dark:text-slate-200 group-hover:text-blue-600 dark:group-hover:text-blue-400 transition-colors">{r.diagnosis.replace(/^\[ADDENDUM\]\s*/, "")}</p>
-                                </div>
-                              ) : (
-                                <p className="text-sm font-bold text-slate-900 dark:text-slate-200 group-hover:text-blue-600 dark:group-hover:text-blue-400 transition-colors">{r.diagnosis}</p>
-                              )}
+                              <div 
+                                onClick={() => setSelectedRecord(r)}
+                                className="bg-slate-50 dark:bg-slate-950 border border-slate-100 dark:border-slate-800 rounded-xl p-3.5 hover:border-blue-300 dark:hover:border-blue-700 hover:shadow-md cursor-pointer transition-all space-y-2 group"
+                              >
+                                {r.diagnosis.startsWith("[REVISI]") ? (
+                                  <div className="space-y-1">
+                                    <Badge className="bg-amber-100 dark:bg-amber-950/60 text-amber-800 dark:text-amber-300 border border-amber-300 dark:border-amber-800/60 text-[10px] font-bold shadow-none inline-flex items-center gap-1">
+                                      <RotateCcw className="w-2.5 h-2.5 text-amber-600 dark:text-amber-400" /> Koreksi / Revisi
+                                    </Badge>
+                                    <p className="text-sm font-bold text-slate-900 dark:text-slate-200 group-hover:text-blue-600 dark:group-hover:text-blue-400 transition-colors">{r.diagnosis.replace(/^\[REVISI\]\s*/, "")}</p>
+                                  </div>
+                                ) : r.diagnosis.startsWith("[ADDENDUM]") ? (
+                                  <div className="space-y-1">
+                                    <Badge className="bg-purple-100 dark:bg-purple-950/60 text-purple-800 dark:text-purple-300 border border-purple-300 dark:border-purple-800/60 text-[10px] font-bold shadow-none inline-flex items-center gap-1">
+                                      <PlusCircle className="w-2.5 h-2.5 text-purple-600 dark:text-purple-400" /> Addendum
+                                    </Badge>
+                                    <p className="text-sm font-bold text-slate-900 dark:text-slate-200 group-hover:text-blue-600 dark:group-hover:text-blue-400 transition-colors">{r.diagnosis.replace(/^\[ADDENDUM\]\s*/, "")}</p>
+                                  </div>
+                                ) : (
+                                  <p className="text-sm font-bold text-slate-900 dark:text-slate-200 group-hover:text-blue-600 dark:group-hover:text-blue-400 transition-colors">{r.diagnosis}</p>
+                                )}
 
-                              {r.prescription && (
-                                <div className="flex items-center gap-1.5 text-xs text-emerald-700 dark:text-emerald-400 font-medium bg-emerald-50/50 dark:bg-emerald-950/30 p-1.5 rounded-lg">
-                                  <Pill className="w-3 h-3 shrink-0" />
-                                  <span className="truncate">{r.prescription}</span>
-                                </div>
-                              )}
+                                {r.prescription && (
+                                  <div className="flex items-center gap-1.5 text-xs text-emerald-700 dark:text-emerald-400 font-medium bg-emerald-50/50 dark:bg-emerald-950/30 p-2 rounded-lg">
+                                    <Pill className="w-3.5 h-3.5 shrink-0 text-emerald-600 dark:text-emerald-400" />
+                                    <span className="truncate">{r.prescription}</span>
+                                  </div>
+                                )}
 
-                              <div className="flex items-center justify-between text-[10px] text-slate-400 dark:text-slate-500 pt-1 border-t border-slate-100 dark:border-slate-900">
-                                <span>Klik untuk detail rekam medis</span>
-                                <ChevronRight className="w-3 h-3 group-hover:translate-x-1 transition-transform" />
+                                <div className="flex items-center justify-between text-[10px] text-slate-400 dark:text-slate-500 pt-1 border-t border-slate-100 dark:border-slate-900">
+                                  <span>Klik untuk detail rekam medis</span>
+                                  <ChevronRight className="w-3 h-3 group-hover:translate-x-1 transition-transform" />
+                                </div>
                               </div>
                             </div>
                           </div>
-                        </div>
-                      ))}
+                        ))}
+                      </div>
                     </div>
                   )}
                 </div>
