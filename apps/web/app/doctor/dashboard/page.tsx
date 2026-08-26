@@ -782,15 +782,25 @@ function DashboardContent() {
 
           {/* === QR SCANNER MODAL === */}
           {showQR && !patient && (
-            <motion.div key="qr-scanner" initial={{ opacity: 0, scale: 0.95 }} animate={{ opacity: 1, scale: 1 }} className="max-w-md">
+            <motion.div key="qr-scanner" initial={{ opacity: 0, scale: 0.95 }} animate={{ opacity: 1, scale: 1 }} className="max-w-lg w-full">
               <Card className="border shadow-md border-blue-200">
-                <CardHeader className="text-center pb-2">
-                  <div className="w-12 h-12 bg-blue-50 rounded-xl flex items-center justify-center mx-auto mb-3">
-                    <QrCode className="w-6 h-6 text-blue-600" />
+                <CardHeader className="text-center pb-3 border-b border-slate-100 dark:border-slate-800">
+                  <div className="flex items-center justify-between">
+                    <div className="flex items-center gap-2">
+                      <div className="w-9 h-9 bg-blue-50 dark:bg-blue-900/30 rounded-xl flex items-center justify-center">
+                        <QrCode className="w-5 h-5 text-blue-600 dark:text-blue-400" />
+                      </div>
+                      <div className="text-left">
+                        <CardTitle className="text-base">Scan QR Code Pasien</CardTitle>
+                        <p className="text-xs text-slate-400 font-normal mt-0.5">Gunakan kamera atau upload foto QR</p>
+                      </div>
+                    </div>
+                    <button onClick={() => setShowQR(false)} className="p-1.5 rounded-lg text-slate-400 hover:text-slate-600 hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors">
+                      <X className="w-4 h-4" />
+                    </button>
                   </div>
-                  <CardTitle className="text-lg">Scan QR Pasien</CardTitle>
                 </CardHeader>
-                <CardContent className="flex flex-col items-center">
+                <CardContent className="p-4">
                   <QRScanner onScanSuccess={handleScanSuccess} />
                   <Button onClick={() => setShowQR(false)} variant="ghost" className="mt-4 text-slate-500">
                     Batal
