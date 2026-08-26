@@ -7,7 +7,8 @@ import {
   Shield, LogOut, Stethoscope, Users, Search, ChevronRight,
   Loader2, CheckCircle2, AlertCircle, FileText, Calendar, Pill,
   ClipboardList, Lock, Activity, Plus, X, User as UserIcon, Clock,
-  QrCode, Zap, Sparkles, TriangleAlert, Download, ShieldCheck, Moon, Sun
+  QrCode, Zap, Sparkles, TriangleAlert, Download, ShieldCheck, Moon, Sun,
+  RotateCcw, PlusCircle, Tag
 } from "lucide-react";
 import { useTheme } from "next-themes";
 import { Button } from "@/components/ui/button";
@@ -191,6 +192,7 @@ function DashboardContent() {
     prescription: "",
     notes: "",
     icd_code: "",
+    record_type: "rutin",
     visit_date: new Date().toISOString().split('T')[0]
   });
 
@@ -378,12 +380,27 @@ function DashboardContent() {
     const token = localStorage.getItem("cg_token")!;
     setAddingRecord(true);
     try {
-      await doctorApi.createRecord(patient.patient_id, newRecord, token);
-      toast.success("Rekam medis berhasil ditambahkan!");
+      let formattedDiagnosis = newRecord.diagnosis.trim();
+      if (newRecord.record_type === "revisi" && !formattedDiagnosis.startsWith("[REVISI]")) {
+        formattedDiagnosis = `[REVISI] ${formattedDiagnosis}`;
+      } else if (newRecord.record_type === "addendum" && !formattedDiagnosis.startsWith("[ADDENDUM]")) {
+        formattedDiagnosis = `[ADDENDUM] ${formattedDiagnosis}`;
+      }
+
+      const payload = {
+        diagnosis: formattedDiagnosis,
+        prescription: newRecord.prescription,
+        notes: newRecord.notes,
+        icd_code: newRecord.icd_code,
+        visit_date: newRecord.visit_date
+      };
+
+      await doctorApi.createRecord(patient.patient_id, payload, token);
+      toast.success(newRecord.record_type === "revisi" ? "Catatan revisi rekam medis berhasil disimpan!" : "Rekam medis berhasil ditambahkan!");
       setShowAddForm(false);
       
       setNewRecord({
-        diagnosis: "", prescription: "", notes: "", icd_code: "",
+        diagnosis: "", prescription: "", notes: "", icd_code: "", record_type: "rutin",
         visit_date: new Date().toISOString().split('T')[0]
       });
 
@@ -873,10 +890,52 @@ function DashboardContent() {
                       </CardHeader>
                       <CardContent className="p-6 bg-white dark:bg-slate-900 transition-colors">
                         <form onSubmit={handleAddRecord} className="space-y-4">
+                          {/* Label Category Selector */}
+                          <div className="space-y-1.5">
+                            <Label className="font-semibold text-slate-700 dark:text-slate-300 transition-colors text-xs uppercase tracking-wider flex items-center gap-1.5">
+                              <Tag className="w-3.5 h-3.5 text-blue-600 dark:text-blue-400" />
+                              Kategori Entri Catatan Medis (Status Medikolegal)
+                            </Label>
+                            <div className="grid grid-cols-1 sm:grid-cols-3 gap-2.5">
+                              {[
+                                { id: "rutin", label: "Kunjungan Rutin", icon: Stethoscope, desc: "Catatan diagnosis utama baru" },
+                                { id: "revisi", label: "Koreksi / Revisi", icon: RotateCcw, desc: "Perbaikan atas kesalahan input sebelumnya" },
+                                { id: "addendum", label: "Addendum Tambahan", icon: PlusCircle, desc: "Catatan resep/observasi susulan" },
+                              ].map((item) => {
+                                const IconComp = item.icon;
+                                const isSelected = newRecord.record_type === item.id;
+                                return (
+                                  <button
+                                    key={item.id}
+                                    type="button"
+                                    onClick={() => setNewRecord({ ...newRecord, record_type: item.id })}
+                                    className={`flex flex-col items-start p-3 rounded-xl border text-left transition-all ${
+                                      isSelected
+                                        ? item.id === "revisi"
+                                          ? "bg-amber-50/80 dark:bg-amber-950/50 border-amber-300 dark:border-amber-700 text-amber-900 dark:text-amber-300 ring-2 ring-amber-500/20"
+                                          : item.id === "addendum"
+                                          ? "bg-purple-50/80 dark:bg-purple-950/50 border-purple-300 dark:border-purple-700 text-purple-900 dark:text-purple-300 ring-2 ring-purple-500/20"
+                                          : "bg-blue-50/80 dark:bg-blue-950/50 border-blue-300 dark:border-blue-700 text-blue-900 dark:text-blue-300 ring-2 ring-blue-500/20"
+                                        : "bg-slate-50 dark:bg-slate-950 border-slate-200 dark:border-slate-800 text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-900"
+                                    }`}
+                                  >
+                                    <div className="flex items-center gap-1.5 font-bold text-xs">
+                                      <IconComp className="w-3.5 h-3.5 shrink-0" />
+                                      <span>{item.label}</span>
+                                    </div>
+                                    <p className="text-[10px] text-slate-500 dark:text-slate-400 mt-1 leading-tight">{item.desc}</p>
+                                  </button>
+                                );
+                              })}
+                            </div>
+                          </div>
+
                           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                             <div className="space-y-1.5">
-                              <Label className="font-semibold text-slate-700 dark:text-slate-300 transition-colors">Diagnosis Utama *</Label>
-                              <Input required value={newRecord.diagnosis} onChange={e => setNewRecord({...newRecord, diagnosis: e.target.value})} placeholder="cth. Hipertensi" className="bg-slate-50 dark:bg-slate-950 border-slate-200 dark:border-slate-800 transition-colors" />
+                              <Label className="font-semibold text-slate-700 dark:text-slate-300 transition-colors">
+                                {newRecord.record_type === "revisi" ? "Diagnosis (Judul Koreksi) *" : newRecord.record_type === "addendum" ? "Diagnosis (Judul Addendum) *" : "Diagnosis Utama *"}
+                              </Label>
+                              <Input required value={newRecord.diagnosis} onChange={e => setNewRecord({...newRecord, diagnosis: e.target.value})} placeholder={newRecord.record_type === "revisi" ? "cth. Koreksi Resep Dosis Hipertensi" : "cth. Hipertensi"} className="bg-slate-50 dark:bg-slate-950 border-slate-200 dark:border-slate-800 transition-colors" />
                             </div>
                             <div className="space-y-1.5">
                               <Label className="font-semibold text-slate-700 dark:text-slate-300 transition-colors">Kode ICD-10 (Opsional)</Label>
@@ -952,8 +1011,28 @@ function DashboardContent() {
                         <CardContent className="p-5 md:p-6">
                           <div className="flex flex-col md:flex-row items-start justify-between gap-4">
                             <div className="flex-1">
-                              <div className="flex items-center gap-3 mb-2">
-                                <h3 className="text-slate-900 dark:text-white font-extrabold text-lg transition-colors">{r.diagnosis}</h3>
+                              <div className="flex items-center gap-2 mb-2 flex-wrap">
+                                {r.diagnosis.startsWith("[REVISI]") ? (
+                                  <>
+                                    <Badge className="bg-amber-100 dark:bg-amber-950/60 text-amber-800 dark:text-amber-300 border border-amber-300 dark:border-amber-800/60 text-xs font-bold shadow-none inline-flex items-center gap-1">
+                                      <RotateCcw className="w-3 h-3 text-amber-600 dark:text-amber-400" /> Koreksi / Revisi
+                                    </Badge>
+                                    <h3 className="text-slate-900 dark:text-white font-extrabold text-lg transition-colors">
+                                      {r.diagnosis.replace(/^\[REVISI\]\s*/, "")}
+                                    </h3>
+                                  </>
+                                ) : r.diagnosis.startsWith("[ADDENDUM]") ? (
+                                  <>
+                                    <Badge className="bg-purple-100 dark:bg-purple-950/60 text-purple-800 dark:text-purple-300 border border-purple-300 dark:border-purple-800/60 text-xs font-bold shadow-none inline-flex items-center gap-1">
+                                      <PlusCircle className="w-3 h-3 text-purple-600 dark:text-purple-400" /> Addendum
+                                    </Badge>
+                                    <h3 className="text-slate-900 dark:text-white font-extrabold text-lg transition-colors">
+                                      {r.diagnosis.replace(/^\[ADDENDUM\]\s*/, "")}
+                                    </h3>
+                                  </>
+                                ) : (
+                                  <h3 className="text-slate-900 dark:text-white font-extrabold text-lg transition-colors">{r.diagnosis}</h3>
+                                )}
                                 {r.icd_code && (
                                   <Badge variant="outline" className="text-xs font-mono text-slate-600 dark:text-slate-400 bg-slate-50 dark:bg-slate-800 shadow-none border-slate-200 dark:border-slate-700 transition-colors">
                                     {r.icd_code}

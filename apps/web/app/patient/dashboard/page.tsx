@@ -3,7 +3,7 @@
 import { useEffect, useState, useCallback, useRef } from "react";
 import { useRouter } from "next/navigation";
 import { motion, AnimatePresence } from "framer-motion";
-import { Shield, FileText, Clock, Activity, LogOut, Zap, ChevronRight, User, TriangleAlert, QrCode, PowerOff, ShieldCheck, Settings } from "lucide-react";
+import { Shield, FileText, Clock, Activity, LogOut, Zap, ChevronRight, User, TriangleAlert, QrCode, PowerOff, ShieldCheck, Settings, RotateCcw, PlusCircle } from "lucide-react";
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Skeleton } from "@/components/ui/skeleton";
@@ -401,7 +401,23 @@ export default function PatientDashboard() {
                               {new Date(r.visit_date).toLocaleDateString("id-ID", { day: "numeric", month: "short", year: "numeric" })}
                             </span>
                             <div className="bg-slate-50 dark:bg-slate-950 border border-slate-100 dark:border-slate-800 rounded-xl p-3 hover:border-blue-200 dark:hover:border-blue-800 transition-colors">
-                              <p className="text-sm font-bold text-slate-900 dark:text-slate-200">{r.diagnosis}</p>
+                              {r.diagnosis.startsWith("[REVISI]") ? (
+                                <div className="space-y-1">
+                                  <Badge className="bg-amber-100 dark:bg-amber-950/60 text-amber-800 dark:text-amber-300 border border-amber-300 dark:border-amber-800/60 text-[10px] font-bold shadow-none inline-flex items-center gap-1">
+                                    <RotateCcw className="w-2.5 h-2.5 text-amber-600 dark:text-amber-400" /> Koreksi / Revisi
+                                  </Badge>
+                                  <p className="text-sm font-bold text-slate-900 dark:text-slate-200">{r.diagnosis.replace(/^\[REVISI\]\s*/, "")}</p>
+                                </div>
+                              ) : r.diagnosis.startsWith("[ADDENDUM]") ? (
+                                <div className="space-y-1">
+                                  <Badge className="bg-purple-100 dark:bg-purple-950/60 text-purple-800 dark:text-purple-300 border border-purple-300 dark:border-purple-800/60 text-[10px] font-bold shadow-none inline-flex items-center gap-1">
+                                    <PlusCircle className="w-2.5 h-2.5 text-purple-600 dark:text-purple-400" /> Addendum
+                                  </Badge>
+                                  <p className="text-sm font-bold text-slate-900 dark:text-slate-200">{r.diagnosis.replace(/^\[ADDENDUM\]\s*/, "")}</p>
+                                </div>
+                              ) : (
+                                <p className="text-sm font-bold text-slate-900 dark:text-slate-200">{r.diagnosis}</p>
+                              )}
                             </div>
                           </div>
                         </div>
