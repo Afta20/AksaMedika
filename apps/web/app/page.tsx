@@ -329,25 +329,34 @@ export default function LandingPage() {
                 icon: Shield,
                 title: "Akses 100% Terkendali",
                 desc: "Setiap akses dokter membutuhkan izin langsung dari Anda. Tanpa persetujuan Anda, layar rekam medis akan terkunci rapat.",
-                iconBg: "bg-blue-100",
-                iconColor: "text-blue-600",
-                accent: "border-t-4 border-blue-500",
+                iconBg: "bg-blue-100 dark:bg-blue-900/30",
+                iconColor: "text-blue-600 dark:text-blue-400",
+                cardBorder: "border-blue-200 dark:border-blue-900/60",
+                cardBg: "bg-white dark:bg-slate-950",
+                hoverShadow: "0 20px 40px -15px rgba(59,130,246,0.18)",
+                dot: "bg-blue-500",
               },
               {
                 icon: Zap,
                 title: "Sesi Waktu Terbatas",
                 desc: "Sistem akan menghasilkan PIN & QR Code yang akan kedaluwarsa otomatis dalam 30 menit. Tidak ada jalur masuk permanen yang tersisa.",
-                iconBg: "bg-emerald-100",
-                iconColor: "text-emerald-600",
-                accent: "border-t-4 border-emerald-500",
+                iconBg: "bg-emerald-100 dark:bg-emerald-900/30",
+                iconColor: "text-emerald-600 dark:text-emerald-400",
+                cardBorder: "border-emerald-200 dark:border-emerald-900/60",
+                cardBg: "bg-white dark:bg-slate-950",
+                hoverShadow: "0 20px 40px -15px rgba(16,185,129,0.18)",
+                dot: "bg-emerald-500",
               },
               {
                 icon: Activity,
                 title: "Rekam Jejak Transparan",
                 desc: "Di dashboard, Anda bisa memantau layaknya CCTV. Lihat dokter mana yang mengakses data Anda, pada jam berapa, dan lewat pintu mana.",
-                iconBg: "bg-violet-100",
-                iconColor: "text-violet-600",
-                accent: "border-t-4 border-violet-500",
+                iconBg: "bg-violet-100 dark:bg-violet-900/30",
+                iconColor: "text-violet-600 dark:text-violet-400",
+                cardBorder: "border-violet-200 dark:border-violet-900/60",
+                cardBg: "bg-white dark:bg-slate-950",
+                hoverShadow: "0 20px 40px -15px rgba(139,92,246,0.18)",
+                dot: "bg-violet-500",
               },
             ].map((f, i) => (
               <motion.div
@@ -356,12 +365,12 @@ export default function LandingPage() {
                 whileInView={{ opacity: 1, y: 0 }}
                 viewport={{ once: true }}
                 transition={{ delay: i * 0.1 }}
-                whileHover={{ y: -8, boxShadow: "0 20px 40px -15px rgba(0,0,0,0.1)" }}
-                className={`bg-white dark:bg-slate-950 rounded-2xl p-8 shadow-sm transition-all duration-300 cursor-default ${f.accent} border border-transparent dark:border-slate-800`}
+                whileHover={{ y: -6, boxShadow: f.hoverShadow }}
+                className={`${f.cardBg} rounded-2xl p-8 shadow-sm border ${f.cardBorder} transition-all duration-300 cursor-default`}
               >
                 <motion.div 
                   whileHover={{ scale: 1.1 }}
-                  className={`w-12 h-12 ${f.iconBg} dark:bg-opacity-20 rounded-xl flex items-center justify-center mb-5 transition-colors`}
+                  className={`w-12 h-12 ${f.iconBg} rounded-xl flex items-center justify-center mb-5 transition-colors`}
                 >
                   <f.icon className={`w-6 h-6 ${f.iconColor}`} />
                 </motion.div>
