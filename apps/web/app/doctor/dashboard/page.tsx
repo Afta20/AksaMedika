@@ -286,6 +286,13 @@ function DashboardContent() {
   }, [router, loadDoctorData, emergencyParam]);
 
   const handleLogout = () => {
+    if (patient) {
+      const token = localStorage.getItem("cg_token");
+      if (token) {
+        doctorApi.revokeAccess(patient.patient_id, token).catch(() => {});
+      }
+    }
+    sessionStorage.removeItem("cg_active_patient_session");
     localStorage.removeItem("cg_token");
     localStorage.removeItem("cg_user");
     router.push("/");
@@ -437,6 +444,13 @@ function DashboardContent() {
   };
 
   const resetSession = () => {
+    if (patient) {
+      const token = localStorage.getItem("cg_token");
+      if (token) {
+        doctorApi.revokeAccess(patient.patient_id, token).catch(() => {});
+        toast.success("Sesi pemeriksaan diakhiri & izin dilepas secara aman.");
+      }
+    }
     sessionStorage.removeItem("cg_active_patient_session");
     setState("idle");
     setPin(["", "", "", "", "", ""]);

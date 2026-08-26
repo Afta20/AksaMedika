@@ -297,3 +297,41 @@ func (h *Handler) RevokeAccess(c *gin.Context) {
 
 	c.JSON(http.StatusOK, gin.H{"message": "Izin akses berhasil dicabut"})
 }
+
+type DoctorRevokeRequest struct {
+	PatientID string `json:"patient_id" binding:"required"`
+}
+
+// DoctorRevokeAccess allows a doctor to end/revoke access for a patient session.
+// POST /api/doctor/revoke-access
+func (h *Handler) DoctorRevokeAccess(c *gin.Context) {
+	var req DoctorRevokeRequest
+	if err := c.ShouldBindJSON(&req); err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "Patient ID is required"})
+		return
+	}
+
+	doctorID := c.GetString("user_id")
+	doctorName := c.GetString("user_name")
+
+	// Insert REVOKED audit log from doctor
+	_, err := h.db.Exec(context.Background(),
+		`INSERT INTO audit_logs (patient_id, doctor_id, doctor_name, access_method, ip_address)
+		 VALUES ($1, $2, $3, 'REVOKED', 'Dokter mengakhiri sesi pemeriksaan')`,
+		req.PatientID, doctorID, doctorName,
+	)
+	if err != nil {
+		fmt.Printf("DoctorRevokeAccess DB Error: %v\n", err)
+	}
+
+	// Invalidate any active unexpired access tokens for this patient
+	_, _ = h.db.Exec(context.Background(),
+		`UPDATE access_tokens SET is_used = true WHERE patient_id = $1 AND is_used = false`,
+		req.PatientID,
+	)
+
+	// Send real-time SSE notification to patient
+	notify.GetGlobal(nil).PollAndNotify(req.PatientID, doctorName, "REVOKED")
+
+	c.JSON(http.StatusOK, gin.H{"message": "Sesi pemeriksaan berhasil diakhiri oleh dokter"})
+}

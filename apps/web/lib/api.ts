@@ -96,6 +96,12 @@ export const doctorApi = {
       body: JSON.stringify(payload),
     }, token),
 
+  revokeAccess: (patientId: string, token: string) =>
+    apiFetch<{ message: string }>('/api/doctor/revoke-access', {
+      method: 'POST',
+      body: JSON.stringify({ patient_id: patientId }),
+    }, token),
+
   getPatientRecords: (patientId: string, token: string) =>
     apiFetch<RecordsResponse>(`/api/doctor/records/${patientId}`, {}, token),
 
