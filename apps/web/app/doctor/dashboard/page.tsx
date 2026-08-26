@@ -230,12 +230,32 @@ function DashboardContent() {
     
     // If redirected from Kiosk with emergency param, auto-load records
     if (emergencyParam) {
-      setPatient({
+      const emergencyRes = {
         patient_id: emergencyParam,
         patient_name: emergencyName || "Pasien Darurat (Kiosk)",
         message: "EMERGENCY ACCESS GRANTED"
-      });
+      };
+      setPatient(emergencyRes);
+      setState("success");
+      sessionStorage.setItem("cg_active_patient_session", JSON.stringify({ patient: emergencyRes, timestamp: Date.now() }));
       fetchRecordsAndAI(emergencyParam, token);
+    } else {
+      // Restore active patient session on refresh if within 30 min window
+      const savedSession = sessionStorage.getItem("cg_active_patient_session");
+      if (savedSession) {
+        try {
+          const { patient: savedPatient, timestamp } = JSON.parse(savedSession);
+          if (savedPatient && Date.now() - timestamp < 30 * 60 * 1000) {
+            setPatient(savedPatient);
+            setState("success");
+            fetchRecordsAndAI(savedPatient.patient_id, token);
+          } else {
+            sessionStorage.removeItem("cg_active_patient_session");
+          }
+        } catch (e) {
+          sessionStorage.removeItem("cg_active_patient_session");
+        }
+      }
     }
     
     // KIOSK MODE: 60s inactivity auto-logout
@@ -323,6 +343,7 @@ function DashboardContent() {
       const res = await doctorApi.validateAccess({ pin: fullPin }, token);
       setPatient(res);
       setState("success");
+      sessionStorage.setItem("cg_active_patient_session", JSON.stringify({ patient: res, timestamp: Date.now() }));
       toast.success(`Akses diberikan! Melihat rekam medis ${res.patient_name}`);
       loadDoctorData(token);
       fetchRecordsAndAI(res.patient_id, token);
@@ -343,6 +364,7 @@ function DashboardContent() {
       const res = await doctorApi.validateAccess({ qr_payload: decodedText }, token);
       setPatient(res);
       setState("success");
+      sessionStorage.setItem("cg_active_patient_session", JSON.stringify({ patient: res, timestamp: Date.now() }));
       toast.success(`QR Valid! Mengakses rekam medis ${res.patient_name}`);
       loadDoctorData(token);
       fetchRecordsAndAI(res.patient_id, token);
@@ -364,6 +386,7 @@ function DashboardContent() {
       setPatient(res);
       setState("success");
       setShowEmergency(false);
+      sessionStorage.setItem("cg_active_patient_session", JSON.stringify({ patient: res, timestamp: Date.now() }));
       toast.success(`Akses Darurat Diberikan! Alarm terpicu pada akun ${res.patient_name}.`);
       loadDoctorData(token);
       fetchRecordsAndAI(res.patient_id, token);
@@ -414,6 +437,7 @@ function DashboardContent() {
   };
 
   const resetSession = () => {
+    sessionStorage.removeItem("cg_active_patient_session");
     setState("idle");
     setPin(["", "", "", "", "", ""]);
     setPatient(null);

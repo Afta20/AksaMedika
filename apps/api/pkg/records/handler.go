@@ -38,24 +38,29 @@ type MedicalRecord struct {
 	CreatedAt   string `json:"created_at"`
 }
 
-// MaskedRecord is a redacted version shown without consent.
+// MaskedRecord represents patient medical records.
 type MaskedRecord struct {
-	ID        string `json:"id"`
-	VisitDate string `json:"visit_date"`
-	Diagnosis string `json:"diagnosis"` // partially masked
-	CreatedAt string `json:"created_at"`
+	ID           string `json:"id"`
+	VisitDate    string `json:"visit_date"`
+	Diagnosis    string `json:"diagnosis"`
+	Prescription string `json:"prescription,omitempty"`
+	Notes        string `json:"notes,omitempty"`
+	DoctorName   string `json:"doctor_name,omitempty"`
+	ICDCode      string `json:"icd_code,omitempty"`
+	CreatedAt    string `json:"created_at"`
 }
 
-// ListPatientRecords returns masked records for the authenticated patient.
+// ListPatientRecords returns records for the authenticated patient.
 // GET /api/patient/records
 func (h *Handler) ListPatientRecords(c *gin.Context) {
 	patientID := c.GetString("user_id")
 
 	rows, err := h.db.Query(context.Background(),
-		`SELECT id, visit_date::text, diagnosis, created_at::text, COALESCE(data_integrity_hash, '')
-		 FROM medical_records
-		 WHERE patient_id = $1
-		 ORDER BY visit_date DESC`,
+		`SELECT mr.id, mr.visit_date::text, mr.diagnosis, COALESCE(mr.prescription, ''), COALESCE(mr.notes, ''), COALESCE(u.name, 'Dokter Aksamedika'), COALESCE(mr.icd_code, ''), mr.created_at::text, COALESCE(mr.data_integrity_hash, '')
+		 FROM medical_records mr
+		 LEFT JOIN users u ON u.id = mr.doctor_id
+		 WHERE mr.patient_id = $1
+		 ORDER BY mr.visit_date DESC`,
 		patientID,
 	)
 	if err != nil {
@@ -68,7 +73,7 @@ func (h *Handler) ListPatientRecords(c *gin.Context) {
 	for rows.Next() {
 		var r MaskedRecord
 		var diag, hash string
-		if err := rows.Scan(&r.ID, &r.VisitDate, &diag, &r.CreatedAt, &hash); err != nil {
+		if err := rows.Scan(&r.ID, &r.VisitDate, &diag, &r.Prescription, &r.Notes, &r.DoctorName, &r.ICDCode, &r.CreatedAt, &hash); err != nil {
 			continue
 		}
 		
@@ -84,8 +89,6 @@ func (h *Handler) ListPatientRecords(c *gin.Context) {
 		}
 
 		r.Diagnosis = decryptedDiag
-		// API masking: partially redact diagnosis for the patient's own list
-		// (Full record visible on detail page — patient can always see their own full data)
 		records = append(records, r)
 	}
 

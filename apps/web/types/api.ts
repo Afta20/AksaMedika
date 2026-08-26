@@ -57,6 +57,10 @@ export interface MaskedRecord {
   id: string;
   visit_date: string;
   diagnosis: string;
+  prescription?: string;
+  notes?: string;
+  doctor_name?: string;
+  icd_code?: string;
   created_at: string;
 }
 

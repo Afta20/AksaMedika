@@ -3,7 +3,7 @@
 import { useEffect, useState, useCallback, useRef } from "react";
 import { useRouter } from "next/navigation";
 import { motion, AnimatePresence } from "framer-motion";
-import { Shield, FileText, Clock, Activity, LogOut, Zap, ChevronRight, User, TriangleAlert, QrCode, PowerOff, ShieldCheck, Settings, RotateCcw, PlusCircle } from "lucide-react";
+import { Shield, FileText, Clock, Activity, LogOut, Zap, ChevronRight, User, TriangleAlert, QrCode, PowerOff, ShieldCheck, Settings, RotateCcw, PlusCircle, Pill, ClipboardList, Download, X } from "lucide-react";
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Skeleton } from "@/components/ui/skeleton";
@@ -23,7 +23,70 @@ export default function PatientDashboard() {
   const [loading, setLoading] = useState(true);
   const [sessionRevoked, setSessionRevoked] = useState(false);
   const [revoking, setRevoking] = useState(false);
+  const [selectedRecord, setSelectedRecord] = useState<MaskedRecord | null>(null);
   const [showQRZoom, setShowQRZoom] = useState(false);
+
+  const exportPatientRecordToPDF = async (record: MaskedRecord, patientName: string) => {
+    const { jsPDF } = await import("jspdf");
+    const doc = new jsPDF({ unit: "mm", format: "a4" });
+    const margin = 20;
+    const pageW = 210;
+    const col = pageW - margin * 2;
+    let y = margin;
+
+    // Header
+    doc.setFillColor(37, 99, 235);
+    doc.rect(0, 0, pageW, 28, "F");
+    doc.setTextColor(255, 255, 255);
+    doc.setFont("helvetica", "bold");
+    doc.setFontSize(14);
+    doc.text("Aksamedika", margin, 12);
+    doc.setFont("helvetica", "normal");
+    doc.setFontSize(8);
+    doc.text("Zero-Trust Electronic Medical Record — Laporan Pasien", margin, 19);
+
+    y = 40;
+    doc.setFillColor(248, 250, 252);
+    doc.roundedRect(margin, y, col, 22, 3, 3, "F");
+    doc.setTextColor(15, 23, 42);
+    doc.setFont("helvetica", "bold");
+    doc.setFontSize(9);
+    doc.text("INFORMASI PASIEN & DOKTER", margin + 5, y + 7);
+    doc.setFont("helvetica", "normal");
+    doc.text(`Nama Pasien: ${patientName}`, margin + 5, y + 14);
+    doc.text(`Dokter: ${record.doctor_name || "Dokter Aksamedika"}`, margin + 90, y + 14);
+    y += 30;
+
+    doc.setFont("helvetica", "bold");
+    doc.setFontSize(11);
+    doc.setTextColor(37, 99, 235);
+    doc.text(record.diagnosis, margin, y);
+    y += 10;
+
+    if (record.prescription) {
+      doc.setFont("helvetica", "bold");
+      doc.setFontSize(8);
+      doc.setTextColor(71, 85, 105);
+      doc.text("Resep Obat:", margin, y);
+      doc.setFont("helvetica", "normal");
+      doc.setTextColor(15, 23, 42);
+      doc.text(record.prescription, margin + 35, y);
+      y += 8;
+    }
+
+    if (record.notes) {
+      doc.setFont("helvetica", "bold");
+      doc.setFontSize(8);
+      doc.setTextColor(71, 85, 105);
+      doc.text("Catatan Medis:", margin, y);
+      doc.setFont("helvetica", "normal");
+      doc.setTextColor(15, 23, 42);
+      doc.text(record.notes, margin + 35, y);
+      y += 8;
+    }
+
+    doc.save(`rekam-medis-${patientName.replace(/\s+/g, "-").toLowerCase()}-${record.id.slice(0, 8)}.pdf`);
+  };
 
   const loadData = useCallback(async (token: string) => {
     try {
@@ -390,34 +453,57 @@ export default function PatientDashboard() {
                       <p className="text-slate-500 dark:text-slate-400 text-sm font-medium transition-colors">Belum ada riwayat medis</p>
                     </div>
                   ) : (
-                    <div className="relative pl-3 border-l-2 border-slate-100 dark:border-slate-800 space-y-6 py-2 transition-colors">
-                      {records.slice(0, 4).map((r, i) => (
+                    <div className="relative pl-3 border-l-2 border-slate-100 dark:border-slate-800 space-y-6 py-2 transition-colors max-h-[500px] overflow-y-auto pr-1">
+                      {records.map((r, i) => (
                         <div key={r.id} className="relative">
                           {/* Timeline dot */}
-                          <div className="absolute -left-[17px] top-1 w-3 h-3 bg-white dark:bg-slate-900 border-2 border-blue-500 rounded-full transition-colors" />
+                          <div className="absolute -left-[17px] top-1.5 w-3 h-3 bg-white dark:bg-slate-900 border-2 border-blue-500 rounded-full transition-colors" />
                           
                           <div className="pl-4">
-                            <span className="text-xs font-bold text-blue-600 dark:text-blue-400 mb-1 block transition-colors">
-                              {new Date(r.visit_date).toLocaleDateString("id-ID", { day: "numeric", month: "short", year: "numeric" })}
-                            </span>
-                            <div className="bg-slate-50 dark:bg-slate-950 border border-slate-100 dark:border-slate-800 rounded-xl p-3 hover:border-blue-200 dark:hover:border-blue-800 transition-colors">
+                            <div className="flex items-center justify-between gap-2 mb-1">
+                              <span className="text-xs font-bold text-blue-600 dark:text-blue-400 block transition-colors">
+                                {new Date(r.visit_date).toLocaleDateString("id-ID", { day: "numeric", month: "short", year: "numeric" })}
+                              </span>
+                              {r.doctor_name && (
+                                <span className="text-[10px] text-slate-400 dark:text-slate-500 font-medium">
+                                  {r.doctor_name}
+                                </span>
+                              )}
+                            </div>
+
+                            <div 
+                              onClick={() => setSelectedRecord(r)}
+                              className="bg-slate-50 dark:bg-slate-950 border border-slate-100 dark:border-slate-800 rounded-xl p-3.5 hover:border-blue-300 dark:hover:border-blue-700 hover:shadow-md cursor-pointer transition-all space-y-2 group"
+                            >
                               {r.diagnosis.startsWith("[REVISI]") ? (
                                 <div className="space-y-1">
                                   <Badge className="bg-amber-100 dark:bg-amber-950/60 text-amber-800 dark:text-amber-300 border border-amber-300 dark:border-amber-800/60 text-[10px] font-bold shadow-none inline-flex items-center gap-1">
                                     <RotateCcw className="w-2.5 h-2.5 text-amber-600 dark:text-amber-400" /> Koreksi / Revisi
                                   </Badge>
-                                  <p className="text-sm font-bold text-slate-900 dark:text-slate-200">{r.diagnosis.replace(/^\[REVISI\]\s*/, "")}</p>
+                                  <p className="text-sm font-bold text-slate-900 dark:text-slate-200 group-hover:text-blue-600 dark:group-hover:text-blue-400 transition-colors">{r.diagnosis.replace(/^\[REVISI\]\s*/, "")}</p>
                                 </div>
                               ) : r.diagnosis.startsWith("[ADDENDUM]") ? (
                                 <div className="space-y-1">
                                   <Badge className="bg-purple-100 dark:bg-purple-950/60 text-purple-800 dark:text-purple-300 border border-purple-300 dark:border-purple-800/60 text-[10px] font-bold shadow-none inline-flex items-center gap-1">
                                     <PlusCircle className="w-2.5 h-2.5 text-purple-600 dark:text-purple-400" /> Addendum
                                   </Badge>
-                                  <p className="text-sm font-bold text-slate-900 dark:text-slate-200">{r.diagnosis.replace(/^\[ADDENDUM\]\s*/, "")}</p>
+                                  <p className="text-sm font-bold text-slate-900 dark:text-slate-200 group-hover:text-blue-600 dark:group-hover:text-blue-400 transition-colors">{r.diagnosis.replace(/^\[ADDENDUM\]\s*/, "")}</p>
                                 </div>
                               ) : (
-                                <p className="text-sm font-bold text-slate-900 dark:text-slate-200">{r.diagnosis}</p>
+                                <p className="text-sm font-bold text-slate-900 dark:text-slate-200 group-hover:text-blue-600 dark:group-hover:text-blue-400 transition-colors">{r.diagnosis}</p>
                               )}
+
+                              {r.prescription && (
+                                <div className="flex items-center gap-1.5 text-xs text-emerald-700 dark:text-emerald-400 font-medium bg-emerald-50/50 dark:bg-emerald-950/30 p-1.5 rounded-lg">
+                                  <Pill className="w-3 h-3 shrink-0" />
+                                  <span className="truncate">{r.prescription}</span>
+                                </div>
+                              )}
+
+                              <div className="flex items-center justify-between text-[10px] text-slate-400 dark:text-slate-500 pt-1 border-t border-slate-100 dark:border-slate-900">
+                                <span>Klik untuk detail rekam medis</span>
+                                <ChevronRight className="w-3 h-3 group-hover:translate-x-1 transition-transform" />
+                              </div>
                             </div>
                           </div>
                         </div>
@@ -590,6 +676,131 @@ export default function PatientDashboard() {
               >
                 Tutup
               </button>
+            </motion.div>
+          </motion.div>
+        )}
+        {/* Record Detail Modal */}
+        {selectedRecord && (
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/60 backdrop-blur-sm overflow-y-auto"
+            onClick={() => setSelectedRecord(null)}
+          >
+            <motion.div
+              initial={{ scale: 0.95, opacity: 0 }}
+              animate={{ scale: 1, opacity: 1 }}
+              exit={{ scale: 0.95, opacity: 0 }}
+              className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 p-6 md:p-8 rounded-3xl shadow-2xl w-full max-w-lg relative my-8"
+              onClick={(e) => e.stopPropagation()}
+            >
+              <button
+                onClick={() => setSelectedRecord(null)}
+                className="absolute top-5 right-5 p-2 text-slate-400 hover:text-slate-600 dark:hover:text-slate-200 rounded-full hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors"
+              >
+                <X className="w-5 h-5" />
+              </button>
+
+              <div className="flex items-center gap-2 mb-4">
+                <div className="w-10 h-10 bg-blue-50 dark:bg-blue-900/30 rounded-xl flex items-center justify-center">
+                  <FileText className="w-5 h-5 text-blue-600 dark:text-blue-400" />
+                </div>
+                <div>
+                  <h3 className="font-bold text-slate-900 dark:text-white text-base">Detail Rekam Medis</h3>
+                  <p className="text-xs text-slate-500 dark:text-slate-400">Zero-Trust EMR Verification</p>
+                </div>
+              </div>
+
+              <div className="space-y-4 text-sm">
+                {/* Category Badge & Diagnosis */}
+                <div className="p-4 bg-slate-50 dark:bg-slate-950 rounded-2xl border border-slate-100 dark:border-slate-800">
+                  <div className="flex items-center justify-between gap-2 mb-2">
+                    {selectedRecord.diagnosis.startsWith("[REVISI]") ? (
+                      <Badge className="bg-amber-100 dark:bg-amber-950/60 text-amber-800 dark:text-amber-300 border border-amber-300 dark:border-amber-800/60 text-xs font-bold shadow-none inline-flex items-center gap-1">
+                        <RotateCcw className="w-3 h-3 text-amber-600 dark:text-amber-400" /> Koreksi / Revisi Rekam Medis
+                      </Badge>
+                    ) : selectedRecord.diagnosis.startsWith("[ADDENDUM]") ? (
+                      <Badge className="bg-purple-100 dark:bg-purple-950/60 text-purple-800 dark:text-purple-300 border border-purple-300 dark:border-purple-800/60 text-xs font-bold shadow-none inline-flex items-center gap-1">
+                        <PlusCircle className="w-3 h-3 text-purple-600 dark:text-purple-400" /> Addendum Catatan Medis
+                      </Badge>
+                    ) : (
+                      <Badge className="bg-blue-50 dark:bg-blue-950/60 text-blue-700 dark:text-blue-300 border border-blue-200 dark:border-blue-800/60 text-xs font-bold shadow-none inline-flex items-center gap-1">
+                        <Activity className="w-3 h-3 text-blue-600 dark:text-blue-400" /> Kunjungan Utama
+                      </Badge>
+                    )}
+
+                    {selectedRecord.icd_code && (
+                      <span className="font-mono text-xs text-slate-500 bg-slate-200 dark:bg-slate-800 px-2 py-0.5 rounded">
+                        ICD: {selectedRecord.icd_code}
+                      </span>
+                    )}
+                  </div>
+                  
+                  <p className="font-black text-lg text-slate-900 dark:text-white">
+                    {selectedRecord.diagnosis.replace(/^\[(REVISI|ADDENDUM)\]\s*/, "")}
+                  </p>
+                </div>
+
+                {/* Doctor & Date Info */}
+                <div className="grid grid-cols-2 gap-3 text-xs">
+                  <div className="p-3 bg-slate-50 dark:bg-slate-950 rounded-xl border border-slate-100 dark:border-slate-800">
+                    <p className="text-slate-400 font-medium">Dokter Pemeriksa</p>
+                    <p className="font-bold text-slate-900 dark:text-white mt-0.5">{selectedRecord.doctor_name || "Dokter Aksamedika"}</p>
+                  </div>
+                  <div className="p-3 bg-slate-50 dark:bg-slate-950 rounded-xl border border-slate-100 dark:border-slate-800">
+                    <p className="text-slate-400 font-medium">Tanggal Kunjungan</p>
+                    <p className="font-bold text-slate-900 dark:text-white mt-0.5">
+                      {new Date(selectedRecord.visit_date).toLocaleDateString("id-ID", { day: "numeric", month: "long", year: "numeric" })}
+                    </p>
+                  </div>
+                </div>
+
+                {/* Prescription */}
+                {selectedRecord.prescription && (
+                  <div className="p-3.5 bg-emerald-50/60 dark:bg-emerald-950/30 rounded-xl border border-emerald-100 dark:border-emerald-900/40">
+                    <p className="text-emerald-800 dark:text-emerald-300 font-bold text-xs flex items-center gap-1.5 mb-1">
+                      <Pill className="w-3.5 h-3.5" /> Resep Obat
+                    </p>
+                    <p className="text-emerald-900 dark:text-emerald-200 text-xs font-medium leading-relaxed">{selectedRecord.prescription}</p>
+                  </div>
+                )}
+
+                {/* Notes */}
+                {selectedRecord.notes && (
+                  <div className="p-3.5 bg-blue-50/60 dark:bg-blue-950/30 rounded-xl border border-blue-100 dark:border-blue-900/40">
+                    <p className="text-blue-800 dark:text-blue-300 font-bold text-xs flex items-center gap-1.5 mb-1">
+                      <ClipboardList className="w-3.5 h-3.5" /> Catatan Dokter
+                    </p>
+                    <p className="text-blue-900 dark:text-blue-200 text-xs leading-relaxed">{selectedRecord.notes}</p>
+                  </div>
+                )}
+
+                {/* Zero-Trust Data Integrity Indicator */}
+                <div className="flex items-center gap-2 p-3 bg-emerald-50 dark:bg-emerald-950/40 border border-emerald-200 dark:border-emerald-800/60 rounded-xl text-emerald-700 dark:text-emerald-300 text-xs">
+                  <ShieldCheck className="w-4 h-4 shrink-0 text-emerald-600 dark:text-emerald-400" />
+                  <div>
+                    <p className="font-bold">Integritas Data Terverifikasi (SHA-256)</p>
+                    <p className="text-[10px] text-emerald-600 dark:text-emerald-400">Rekam medis ini terenkripsi & sah secara hukum digital.</p>
+                  </div>
+                </div>
+              </div>
+
+              {/* Actions */}
+              <div className="mt-6 flex items-center gap-3">
+                <button
+                  onClick={() => exportPatientRecordToPDF(selectedRecord, user?.name || "Pasien")}
+                  className="flex-1 py-3 px-4 bg-blue-600 hover:bg-blue-700 text-white font-bold rounded-xl text-xs flex items-center justify-center gap-2 transition-all shadow-md"
+                >
+                  <Download className="w-4 h-4" /> Unduh PDF Resmi
+                </button>
+                <button
+                  onClick={() => setSelectedRecord(null)}
+                  className="py-3 px-5 bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-300 font-bold rounded-xl text-xs transition-colors"
+                >
+                  Tutup
+                </button>
+              </div>
             </motion.div>
           </motion.div>
         )}
