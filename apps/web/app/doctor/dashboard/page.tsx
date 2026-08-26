@@ -367,8 +367,20 @@ function DashboardContent() {
     setShowQR(false);
     setState("loading");
     const token = localStorage.getItem("cg_token")!;
+
+    // The consent page encodes QR as JSON: {payload: "<uuid>", exp: "..."}.
+    // Extract the raw UUID if that's the case; otherwise pass through as-is
+    // (handles plain UUID strings and PATIENT:<id> static identity QRs).
+    let qrPayload = decodedText.trim();
     try {
-      const res = await doctorApi.validateAccess({ qr_payload: decodedText }, token);
+      const parsed = JSON.parse(qrPayload);
+      if (parsed?.payload) qrPayload = parsed.payload;
+    } catch {
+      // Not JSON — use raw value
+    }
+
+    try {
+      const res = await doctorApi.validateAccess({ qr_payload: qrPayload }, token);
       setPatient(res);
       setState("success");
       sessionStorage.setItem("cg_active_patient_session", JSON.stringify({ patient: res, timestamp: Date.now() }));
@@ -379,7 +391,7 @@ function DashboardContent() {
       setState("error");
       setShaking(true);
       setTimeout(() => setShaking(false), 600);
-      toast.error("QR Code tidak valid atau telah kedaluwarsa");
+      toast.error("QR Code tidak valid atau telah kedaluwarsa. Minta pasien buat token baru.");
       setTimeout(() => { setState("idle"); }, 2500);
     }
   };

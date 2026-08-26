@@ -201,7 +201,7 @@ export default function ConsentPage() {
                   <p className="text-slate-500 text-xs font-bold uppercase tracking-widest mb-4">QR Code (Opsional)</p>
                   <div className="inline-block p-4 bg-white rounded-2xl border border-slate-100 shadow-sm">
                     <QRCodeSVG
-                      value={JSON.stringify({ payload: consent.qr_payload, exp: consent.expires_at })}
+                      value={consent.qr_payload}
                       size={180}
                       fgColor="#0f172a"
                       bgColor="#ffffff"
